@@ -1,90 +1,132 @@
-<!DOCTYPE html><html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ganha até 10.000MT na Roleta!</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roleta de Prêmios</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: linear-gradient(#ffeaa7, #fab1a0);
+      background: #f2f2f2;
       margin: 0;
       padding: 0;
     }
-    h1 {
-      margin-top: 30px;
+
+    .container {
+      margin-top: 50px;
     }
-    #roleta {
-      width: 200px;
-      height: 200px;
-      margin: 40px auto;
-      border: 10px solid #d63031;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #fff;
+
+    .roleta {
+      position: relative;
+      margin: 0 auto;
+      width: 300px;
+      height: 300px;
+    }
+
+    .seta {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
       font-size: 24px;
-      font-weight: bold;
-      transition: transform 2s ease-out;
+      color: red;
     }
-    #mensagemFinal {
-      display: none;
-      font-size: 22px;
-      margin-top: 20px;
-    }
-    #btnCadastrar {
-      display: none;
+
+    button {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 18px;
-      background: #00b894;
+      background-color: #28a745;
       color: white;
       border: none;
-      border-radius: 10px;
       cursor: pointer;
+      border-radius: 6px;
     }
-    #btnCadastrar:hover {
-      background: #019875;
+
+    .mensagem {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Gira a roleta e ganha até 10.000 Meticais!</h1>
-  <div id="roleta">Clique para girar</div>
-  <div id="mensagemFinal">🎉 Parabéns! Você ganhou! 🎉</div>
-  <button id="btnCadastrar" onclick="window.location.href='https://is.gd/hHdRiZ'">Cadastrar-se</button>  <script>
-    const roleta = document.getElementById('roleta');
-    const mensagem = document.getElementById('mensagemFinal');
-    const botao = document.getElementById('btnCadastrar');
+  <div class="container">
+    <h1>Gire a Roleta!</h1>
+    <div class="roleta" id="roleta">
+      <div class="seta">▼</div>
+      <canvas id="canvas" width="300" height="300"></canvas>
+    </div>
+    <button id="girar">Girar</button>
+    <div class="mensagem" id="mensagem"></div>
+  </div>
 
-    let giros = 0;
-    let premios = ['5000 Meticais', '10000 Meticais'];
+  <script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const mensagem = document.getElementById("mensagem");
+    const btnGirar = document.getElementById("girar");
 
-    roleta.addEventListener('click', () => {
-      if (giros !== 0) return;
+    const premios = ["Boa Sorte", "5000 Meticais", "10000 Meticais"];
+    let etapa = 0;
 
-      giros++;
-      roleta.textContent = 'Girando...';
-      roleta.style.transform = 'rotate(720deg)';
+    function desenharRoleta() {
+      const cores = ["#FFD700", "#FF6347", "#20B2AA"];
+      const anguloPorPremio = (2 * Math.PI) / premios.length;
+
+      for (let i = 0; i < premios.length; i++) {
+        const start = i * anguloPorPremio;
+        const end = start + anguloPorPremio;
+        ctx.beginPath();
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 150, start, end);
+        ctx.fillStyle = cores[i % cores.length];
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.translate(150, 150);
+        ctx.rotate(start + anguloPorPremio / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#000";
+        ctx.font = "16px Arial";
+        ctx.fillText(premios[i], 140, 10);
+        ctx.restore();
+      }
+    }
+
+    function girarRoleta() {
+      const index = etapa === 0 ? 0 : Math.floor(Math.random() * (premios.length - 1)) + 1;
+      const anguloPorPremio = 360 / premios.length;
+      const rotação = 360 * 5 + index * anguloPorPremio + anguloPorPremio / 2;
+
+      canvas.style.transition = "transform 4s ease-out";
+      canvas.style.transform = `rotate(${rotação}deg)`;
+
+      btnGirar.disabled = true;
 
       setTimeout(() => {
-        roleta.textContent = 'Boa Sorte';
-        roleta.style.transform = 'rotate(0deg)';
+        if (etapa === 0) {
+          mensagem.innerText = "Parou em: Boa Sorte!";
+        } else {
+          mensagem.innerHTML = `🎉 Você ganhou: ${premios[index]}!<br><br>`;
+          mensagem.innerHTML += `<a href="https://is.gd/hHdRiZ"><button>Registrar</button></a>`;
+        }
+        etapa++;
+        btnGirar.disabled = false;
+      }, 4000);
+    }
 
-        setTimeout(() => {
-          let premio = premios[Math.floor(Math.random() * premios.length)];
-          roleta.textContent = premio;
-
-          setTimeout(() => {
-            roleta.style.display = 'none';
-            mensagem.style.display = 'block';
-            botao.style.display = 'inline-block';
-          }, 2000);
-
-        }, 2000);
-
-      }, 2000);
+    btnGirar.addEventListener("click", () => {
+      canvas.style.transition = "none";
+      canvas.style.transform = "rotate(0deg)";
+      setTimeout(() => {
+        girarRoleta();
+      }, 50);
     });
-  </script></body>
+
+    desenharRoleta();
+  </script>
+</body>
 </html>
