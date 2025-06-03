@@ -16,9 +16,18 @@
       max-width: 360px;
       margin: 0 auto;
       position: relative;
+      padding: 0 10px;
     }
     h1 {
-      margin-bottom: 30px;
+      margin-bottom: 10px;
+      font-size: 1.6rem;
+      color: #222;
+    }
+    .info-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
     }
     .roleta {
       position: relative;
@@ -30,16 +39,19 @@
       border: 8px solid #b8860b; /* aro dourado */
       overflow: hidden;
       background: white;
+      transition: width 0.3s ease, height 0.3s ease;
     }
     #canvas {
       display: block;
       margin: 0 auto;
       border-radius: 50%;
+      width: 100%;
+      height: 100%;
     }
     .seta {
       position: absolute;
       top: 50%;
-      right: -30px;
+      right: -50px; /* afastado da roleta */
       width: 0; 
       height: 0; 
       border-left: 30px solid transparent;
@@ -48,6 +60,7 @@
       transform: translateY(-50%);
       filter: drop-shadow(1px 1px 2px #880000);
       z-index: 10;
+      transition: right 0.3s ease;
     }
     button#girar {
       margin-top: 30px;
@@ -92,11 +105,37 @@
     a#registrar-btn:hover {
       background-color: #34c759;
     }
+
+    /* Responsivo para celular */
+    @media (max-width: 400px) {
+      .roleta {
+        width: 280px;
+        height: 280px;
+      }
+      .seta {
+        right: -40px;
+        border-left: 25px solid transparent;
+        border-right: 25px solid transparent;
+        border-bottom: 33px solid red;
+      }
+      button#girar {
+        font-size: 18px;
+        padding: 12px 30px;
+      }
+      .mensagem {
+        font-size: 18px;
+        min-height: 50px;
+      }
+      .info-text {
+        font-size: 1.1rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Gire a Roleta e Ganhe!</h1>
+    <div class="info-text">Tente a sua sorte!</div>
     <div class="roleta">
       <canvas id="canvas" width="360" height="360"></canvas>
       <div class="seta" title="Seta Indicadora"></div>
@@ -105,11 +144,18 @@
     <div class="mensagem" id="mensagem"></div>
   </div>
 
+  <!-- Áudio de giro -->
+  <audio id="audio-giro" loop>
+    <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
+    Seu navegador não suporta áudio.
+  </audio>
+
   <script>
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     const btnGirar = document.getElementById('girar');
     const mensagem = document.getElementById('mensagem');
+    const audioGiro = document.getElementById('audio-giro');
 
     const premios = [
       { texto: '10 Meticais', cor: '#ff3b3b' },        // vermelho
@@ -173,31 +219,27 @@
       btnGirar.disabled = true;
       mensagem.textContent = '';
 
+      // Começa o som
+      audioGiro.currentTime = 0;
+      audioGiro.play();
+
       // Definir em qual fatia a roleta deve parar
       let fatiaDestino;
 
       if(tentativas === 0) {
-        // Na primeira tentativa, sempre para em "Boa Meticais Sorte"
         fatiaDestino = premios.findIndex(p => p.texto === 'Boa Meticais Sorte');
       } else if(tentativas === maxTentativas -1) {
-        // Na última tentativa, escolhe aleatório entre "5000 Meticais" e "10000 Meticais"
         const opcoes = ['5000 Meticais', '10000 Meticais'];
         const escolha = opcoes[Math.floor(Math.random() * opcoes.length)];
         fatiaDestino = premios.findIndex(p => p.texto === escolha);
       } else {
-        // Caso tenha mais tentativas no futuro, aqui pode ser aleatório
         fatiaDestino = Math.floor(Math.random() * numFatias);
       }
 
-      // Calcular ângulo de parada para o fatiaDestino (centralizado)
       const anguloDestino = (numFatias - fatiaDestino) * anguloPorFat - (anguloPorFat / 2);
-
-      // Número total de rotações (5 a 7) para animar bem o giro
       const giros = Math.floor(Math.random() * 2) + 5;
+      const duracao = 5000;
 
-      const duracao = 5000; // 5 segundos
-
-      // Animação com requestAnimationFrame
       const inicio = performance.now();
       const rotacaoInicial = rotacaoAtual;
       const rotacaoFinal = (giros * 2 * Math.PI) + anguloDestino;
@@ -205,16 +247,15 @@
       function animar(now) {
         const tempoDecorrido = now - inicio;
         if(tempoDecorrido < duracao) {
-          // Easing para desacelerar o giro (ease out cubic)
           const t = tempoDecorrido / duracao;
           const easing = 1 - Math.pow(1 - t, 3);
           rotacaoAtual = rotacaoInicial + easing * (rotacaoFinal - rotacaoInicial);
           canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
           requestAnimationFrame(animar);
         } else {
-          // Final da animação
           rotacaoAtual = rotacaoFinal % (2 * Math.PI);
           canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
+          audioGiro.pause();
           mostrarResultado(fatiaDestino);
           tentativas++;
           btnGirar.disabled = false;
