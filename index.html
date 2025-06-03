@@ -1,95 +1,90 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!DOCTYPE html><html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ganhe 10.000MT Jogando Roleta</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ganha até 10.000MT na Roleta!</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      background: #0f172a;
-      color: #fff;
+      background: linear-gradient(#ffeaa7, #fab1a0);
       margin: 0;
       padding: 0;
     }
-    .roleta {
-      margin: 30px auto;
-      width: 300px;
-      height: 300px;
-      border-radius: 50%;
-      border: 10px solid #ffc107;
-      background: url('https://i.imgur.com/LDmWz9z.png') no-repeat center center;
-      background-size: cover;
-      transition: transform 4s ease-out;
+    h1 {
+      margin-top: 30px;
     }
-    button {
-      background-color: #10b981;
-      color: white;
-      padding: 15px 30px;
+    #roleta {
+      width: 200px;
+      height: 200px;
+      margin: 40px auto;
+      border: 10px solid #d63031;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      transition: transform 2s ease-out;
+    }
+    #mensagemFinal {
+      display: none;
+      font-size: 22px;
+      margin-top: 20px;
+    }
+    #btnCadastrar {
+      display: none;
+      margin-top: 20px;
+      padding: 10px 20px;
       font-size: 18px;
+      background: #00b894;
+      color: white;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      margin-top: 20px;
     }
-    #mensagem {
-      display: none;
-      background-color: white;
-      color: black;
-      padding: 20px;
-      margin-top: 30px;
-      border-radius: 10px;
-      width: 90%;
-      max-width: 400px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    #mensagem button {
-      background-color: orange;
-      margin-top: 15px;
+    #btnCadastrar:hover {
+      background: #019875;
     }
   </style>
 </head>
 <body>
+  <h1>Gira a roleta e ganha até 10.000 Meticais!</h1>
+  <div id="roleta">Clique para girar</div>
+  <div id="mensagemFinal">🎉 Parabéns! Você ganhou! 🎉</div>
+  <button id="btnCadastrar" onclick="window.location.href='https://is.gd/hHdRiZ'">Cadastrar-se</button>  <script>
+    const roleta = document.getElementById('roleta');
+    const mensagem = document.getElementById('mensagemFinal');
+    const botao = document.getElementById('btnCadastrar');
 
-  <h1>🎯 Ganhe até 10.000MT Jogando Roleta!</h1>
-  <p>Clique no botão abaixo para girar a roleta. Você tem 3 chances!</p>
-
-  <div class="roleta" id="roleta"></div>
-  <button onclick="girarRoleta()">GIRAR</button>
-
-  <div id="mensagem">
-    <h2>🎉 Resultado 🎉</h2>
-    <p>💰 Parabéns! Você ganhou <strong id="premio">5.000</strong> Meticais!</p>
-    <p>
-      Para receber, registre-se na plataforma clicando no botão abaixo e deposite 1 ou 5 Meticais
-      para confirmar seu número.
-    </p>
-    <p>⚠️ O prêmio só será entregue para quem criar nova conta na plataforma.</p>
-    <a href="https://is.gd/hHdRiZ" target="_blank">
-      <button>💸 REGISTRE-SE AGORA!</button>
-    </a>
-  </div>
-
-  <script>
     let giros = 0;
-    const roleta = document.getElementById("roleta");
-    const mensagem = document.getElementById("mensagem");
-    const premioTexto = document.getElementById("premio");
+    let premios = ['5000 Meticais', '10000 Meticais'];
 
-    function girarRoleta() {
+    roleta.addEventListener('click', () => {
+      if (giros !== 0) return;
+
       giros++;
-      if (giros === 1) {
-        roleta.style.transform = "rotate(1440deg)"; // parar em Boa Sorte
-      } else if (giros === 2) {
-        const angulo = Math.random() < 0.5 ? 2520 : 2700; // 5000 ou 10000
-        roleta.style.transform = `rotate(${angulo}deg)`;
-      } else if (giros === 3) {
-        mensagem.style.display = "block";
-      }
-    }
-  </script>
+      roleta.textContent = 'Girando...';
+      roleta.style.transform = 'rotate(720deg)';
 
-</body>
+      setTimeout(() => {
+        roleta.textContent = 'Boa Sorte';
+        roleta.style.transform = 'rotate(0deg)';
+
+        setTimeout(() => {
+          let premio = premios[Math.floor(Math.random() * premios.length)];
+          roleta.textContent = premio;
+
+          setTimeout(() => {
+            roleta.style.display = 'none';
+            mensagem.style.display = 'block';
+            botao.style.display = 'inline-block';
+          }, 2000);
+
+        }, 2000);
+
+      }, 2000);
+    });
+  </script></body>
 </html>
