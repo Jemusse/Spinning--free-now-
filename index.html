@@ -1,197 +1,148 @@
-<!DOCTYPE html><html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Roleta Realista</title>
+  <title>Roleta de Meticais</title>
   <style>
-    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      background: #ffffff;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background: #fff;
+      text-align: center;
+      font-family: sans-serif;
     }
-    h1 {
-      font-size: 32px;
-      color: #e74c3c;
-      margin-bottom: 5px;
-    }
-    h2 {
-      font-size: 18px;
-      color: #2d3436;
-      margin-bottom: 30px;
-    }
-    .roleta-container {
+    #wheel-container {
       position: relative;
       width: 500px;
       height: 500px;
+      margin: 40px auto;
     }
-    .seta {
+    #wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 15px solid gold;
+      position: relative;
+      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
+    }
+    .slice {
       position: absolute;
-      right: -50px;
-      top: 50%;
-      transform: translateY(-50%);
+      width: 50%;
+      height: 50%;
+      background: red;
+      transform-origin: 100% 100%;
+      clip-path: polygon(100% 100%, 0% 100%, 100% 0%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    #arrow {
       width: 0;
       height: 0;
       border-top: 25px solid transparent;
       border-bottom: 25px solid transparent;
-      border-left: 50px solid red;
-      z-index: 10;
-    }
-    .roleta {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 12px solid gold;
-      position: relative;
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-      background: conic-gradient(
-        red 0deg 45deg,
-        green 45deg 90deg,
-        blue 90deg 135deg,
-        yellow 135deg 180deg,
-        green 180deg 225deg,
-        yellow 225deg 270deg,
-        red 270deg 315deg,
-        red 315deg 360deg
-      );
-    }
-    .roleta .valor {
+      border-left: 50px solid black;
       position: absolute;
-      width: 100%;
-      text-align: center;
+      left: -50px;
       top: 50%;
-      left: 50%;
-      transform-origin: center center;
-      font-weight: bold;
-      font-size: 20px;
-      color: black;
-      transform: rotate(var(--angle)) translate(-50%, -240px) rotate(calc(-1 * var(--angle)));
+      transform: translateY(-50%);
     }
-    .botao-girar {
-      margin-top: 40px;
-      padding: 14px 36px;
-      font-size: 20px;
-      background-color: #e17055;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-    }
-    .botao-girar:hover {
-      background-color: #d35400;
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-    }
-    .modal-conteudo {
-      background: white;
-      padding: 30px;
-      text-align: center;
-      border-radius: 12px;
-      max-width: 90%;
-    }
-    .modal-conteudo button {
+    button {
       margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: green;
-      color: white;
-      border: none;
+      padding: 12px 25px;
+      font-size: 18px;
       border-radius: 8px;
+      border: none;
+      background: gold;
       cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Tente a sua sorte</h1>
-  <h2>Clica no botão e gire a roleta da sorte para ganhar prêmios!</h2>
-  <div class="roleta-container">
-    <div class="roleta" id="roleta"></div>
-    <div class="seta"></div>
+
+  <h1>Gira e Ganha Meticais!</h1>
+  <div id="wheel-container">
+    <div id="arrow"></div>
+    <div id="wheel"></div>
   </div>
-  <button class="botao-girar" onclick="girarRoleta()">GIRAR</button>
-  <div class="modal" id="modal">
-    <div class="modal-conteudo" id="modal-conteudo">
-      <p>Parabéns!</p>
-      <p id="msg-extra"></p>
-      <button id="botao-modal">Registar</button>
-    </div>
-  </div>
-  <audio id="som-vitoria" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f1cf2ed8ab.mp3" preload="auto"></audio>
+  <button id="spin">GIRAR</button>
+
   <script>
-    const setores = [
-      '10 Meticais', '100 Meticais', '500 Meticais', '1000 Meticais', '5000 Meticais', '10000 Meticais', 'Boa Sorte', 'Boa Sorte'
+    const slices = [
+      { label: 'Boa Sorte', color: 'red' },
+      { label: '10', color: 'green' },
+      { label: '100', color: 'blue' },
+      { label: '500', color: 'yellow' },
+      { label: '1000', color: 'green' },
+      { label: '5000', color: 'yellow' },
+      { label: '10000', color: 'red' },
+      { label: '10', color: 'green' }
     ];
-    const roleta = document.getElementById('roleta');
-    const somVitoria = document.getElementById('som-vitoria');
-    const extraMsg = document.getElementById('msg-extra');
-    let tentativas = 0;
-    let anguloAtual = 0;setores.forEach((texto, i) => {
-  const div = document.createElement('div');
-  div.classList.add('valor');
-  div.innerText = texto;
-  div.style.setProperty('--angle', `${i * 45}deg`);
-  roleta.appendChild(div);
-});
 
-function girarRoleta() {
-  if (tentativas >= 2) return;
+    const wheel = document.getElementById('wheel');
+    const spinBtn = document.getElementById('spin');
+    let spinning = false;
+    let spinCount = 0;
 
-  const giros = 5;
-  let alvo;
-
-  if (tentativas === 0) {
-    alvo = setores.lastIndexOf('Boa Sorte');
-  } else {
-    alvo = setores.findIndex(s => s === '10000 Meticais');
-  }
-
-  const destino = 360 * giros + (360 - alvo * 45);
-  anguloAtual += destino;
-  roleta.style.transform = `rotate(${anguloAtual}deg)`;
-
-  setTimeout(() => {
-    tentativas++;
-    if (tentativas === 1) {
-      mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
-    } else {
-      somVitoria.play();
-      mostrarModal(
-        'Parabéns! Você ganhou 10000 Meticais 🎉',
-        'Registar',
-        'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
-      );
+    function buildWheel() {
+      const angle = 360 / slices.length;
+      slices.forEach((slice, index) => {
+        const div = document.createElement('div');
+        div.className = 'slice';
+        div.style.background = slice.color;
+        div.style.transform = `rotate(${index * angle}deg) skewY(-${90 - angle}deg)`;
+        div.innerHTML = `<div style="transform: skewY(${90 - angle}deg) rotate(${angle / 2}deg)">${slice.label}</div>`;
+        wheel.appendChild(div);
+      });
     }
-  }, 5200);
-}
 
-function mostrarModal(msg, botaoTexto, msgExtra = '') {
-  const modal = document.getElementById('modal');
-  const conteudo = document.getElementById('modal-conteudo');
-  conteudo.querySelector('p').innerText = msg;
-  document.getElementById('msg-extra').innerText = msgExtra;
-  const botao = conteudo.querySelector('button');
-  botao.innerText = botaoTexto;
-  botao.onclick = () => {
-    modal.style.display = 'none';
-    if (botaoTexto === 'Registar') {
-      window.location.href = "https://is.gd/hHdRiZ";
+    function getRotationForLabel(label) {
+      const index = slices.findIndex(s => s.label === label);
+      const anglePerSlice = 360 / slices.length;
+      const stopAngle = 360 - (index * anglePerSlice + anglePerSlice / 2);
+      return stopAngle + 360 * 5;
     }
-  };
-  modal.style.display = 'flex';
-}
 
+    function playSound() {
+      const audio = new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
+      audio.play();
+    }
+
+    spinBtn.addEventListener('click', () => {
+      if (spinning) return;
+
+      spinning = true;
+      spinCount++;
+
+      let stopLabel = 'Boa Sorte';
+      if (spinCount === 2) {
+        stopLabel = Math.random() < 0.5 ? '5000' : '10000';
+      }
+
+      const rotation = getRotationForLabel(stopLabel);
+      wheel.style.transition = 'transform 5s cubic-bezier(0.33, 1, 0.68, 1)';
+      wheel.style.transform = `rotate(${rotation}deg)`;
+
+      setTimeout(() => {
+        playSound();
+
+        if (spinCount === 1) {
+          alert(`Resultado: ${stopLabel}`);
+          spinBtn.textContent = 'GIRAR NOVAMENTE';
+        } else {
+          const modal = confirm(`🎉 Parabéns! Você ganhou ${stopLabel} Meticais!\nClique OK para se registar.`);
+          if (modal) {
+            window.location.href = "https://is.gd/hHdRiZ";
+            alert("Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.");
+          }
+        }
+
+        spinning = false;
+      }, 5100);
+    });
+
+    buildWheel();
   </script>
 </body>
-  </html>
+</html>
