@@ -5,36 +5,49 @@
   <title>Roleta de Prêmios</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
-      background: #f9f9f9;
+      background: #f0f0f0;
       padding: 40px;
     }
 
+    #container-roleta {
+      position: relative;
+      width: 320px;
+      margin: 0 auto;
+    }
+
     #roleta {
-      margin: 40px auto;
       width: 300px;
       height: 300px;
-      border: 10px solid gold;
       border-radius: 50%;
-      background: conic-gradient(#ffcc00 0% 25%, #ffffff 25% 50%, #ffcc00 50% 75%, #ffffff 75% 100%);
-      position: relative;
-      transition: transform 3s ease-out;
+      border: 10px solid gold;
+      background: conic-gradient(
+        #ffe066 0deg 45deg,     /* 10 */
+        #ff6666 45deg 90deg,    /* 100 */
+        #66ff66 90deg 135deg,   /* 200 */
+        #6666ff 135deg 180deg,  /* 500 */
+        #ff66ff 180deg 225deg,  /* 1000 */
+        #66ffff 225deg 270deg,  /* 10000 */
+        #dddddd 270deg 315deg,  /* Boa Sorte */
+        #cccccc 315deg 360deg   /* Boa Sorte */
+      );
+      transition: transform 4s ease-out;
     }
 
     .seta {
+      position: absolute;
+      top: 120px;
+      right: -30px;
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-bottom: 30px solid red;
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%);
+      border-top: 20px solid transparent;
+      border-bottom: 20px solid transparent;
+      border-left: 30px solid red;
     }
 
     button {
+      margin-top: 20px;
       padding: 12px 24px;
       font-size: 16px;
       font-weight: bold;
@@ -71,7 +84,7 @@
       padding: 10px 20px;
       border: none;
       border-radius: 5px;
-      background-color: #28a745;
+      background-color: #007bff;
       color: white;
       font-weight: bold;
       cursor: pointer;
@@ -80,9 +93,10 @@
 </head>
 <body>
 
-  <h1>Gire e Ganhe!</h1>
+  <h1>Gire a Roleta e Ganhe!</h1>
 
-  <div id="roleta">
+  <div id="container-roleta">
+    <div id="roleta"></div>
     <div class="seta"></div>
   </div>
 
@@ -93,11 +107,16 @@
   <!-- Modal -->
   <div id="modal-final">
     <p><strong>Caro usuário</strong>, após o seu registo faça um depósito mínimo de <strong>5 MTS</strong> e aguarde pacientemente.<br>Obrigado.</p>
-    <button onclick="fecharModal()">OK</button>
+    <button onclick="window.location.href='https://is.gd/hHdRiZ'">Registar</button>
   </div>
+
+  <!-- Som de vitória -->
+  <audio id="som-vitoria" src="https://www.soundjay.com/human/sounds/applause-8.mp3" preload="auto"></audio>
 
   <script>
     let giros = 0;
+    const roleta = document.getElementById("roleta");
+    const somVitoria = document.getElementById("som-vitoria");
 
     function girar() {
       if (giros >= 3) {
@@ -105,32 +124,40 @@
         return;
       }
 
-      const roleta = document.getElementById("roleta");
-      const rotacao = Math.floor(1000 + Math.random() * 2000);
-      roleta.style.transform = `rotate(${rotacao}deg)`;
+      let anguloFinal = 0;
+
+      if (giros === 0) {
+        // Sempre parar na "Boa Sorte" (posição 7 ou 8 = 270° ou 315°)
+        anguloFinal = 360 * 5 + 280; // 280 = dentro da faixa da "Boa Sorte"
+      } else if (giros === 1) {
+        // Parar entre 5000 e 10000 (posição 5 ou 6 = 180°–270°)
+        anguloFinal = 360 * 6 + (Math.random() < 0.5 ? 200 : 250);
+      } else if (giros === 2) {
+        // Parabéns final
+        anguloFinal = 360 * 4 + 90; // qualquer setor
+      }
+
+      roleta.style.transform = `rotate(${anguloFinal}deg)`;
 
       giros++;
 
       setTimeout(() => {
         if (giros === 1) {
-          document.getElementById("mensagem-final").innerText = "🌀 Boa sorte!";
+          document.getElementById("mensagem-final").innerText = "🎯 Boa sorte!";
         } else if (giros === 2) {
           document.getElementById("mensagem-final").innerText = "🎉 Você ganhou 5000 ou 10000 MTS!";
+          somVitoria.play();
         } else if (giros === 3) {
-          document.getElementById("mensagem-final").innerText = "🎊 Parabéns! Clique abaixo para registrar.";
+          document.getElementById("mensagem-final").innerText = "🎊 Parabéns! Registe-se para receber o seu prêmio.";
           mostrarModalFinal();
         }
-      }, 3000);
+      }, 4000); // Espera o giro terminar
     }
 
     function mostrarModalFinal() {
       document.getElementById("modal-final").style.display = "block";
     }
-
-    function fecharModal() {
-      document.getElementById("modal-final").style.display = "none";
-    }
   </script>
 
 </body>
-</html>
+  </html>
