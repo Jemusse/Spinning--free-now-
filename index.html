@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Roleta Realista</title>
+  <meta charset="UTF-8" />
+  <title>Roleta Realista Ajustada</title>
   <style>
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: linear-gradient(to bottom, #ff9ff3, #feca57);
+      background: white;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -17,42 +17,41 @@
     }
     .roleta-container {
       position: relative;
-      width: 400px;
-      height: 400px;
+      width: 450px;
+      height: 450px;
     }
     .seta {
       position: absolute;
-      left: -40px;
+      left: -50px;
       top: 50%;
       transform: translateY(-50%);
       width: 0;
       height: 0;
-      border-top: 20px solid transparent;
-      border-bottom: 20px solid transparent;
-      border-right: 40px solid red;
+      border-top: 25px solid transparent;
+      border-bottom: 25px solid transparent;
+      border-right: 50px solid gold;
       z-index: 10;
+      filter: drop-shadow(1px 1px 1px #333);
     }
     .roleta {
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 10px solid gold;
+      border: 12px solid gold;
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
-      background: conic-gradient(
-        red 0deg 30deg,           /* Boa Sorte */
-        green 30deg 60deg,        /* 10 */
-        blue 60deg 90deg,         /* 100 */
-        yellow 90deg 120deg,      /* 500 */
-        darkred 120deg 150deg,    /* 1000 */
-        purple 150deg 180deg,     /* 5000 */
-        red 180deg 210deg,        /* Boa Sorte */
-        green 210deg 240deg,      /* 10 */
-        blue 240deg 270deg,       /* 100 */
-        yellow 270deg 300deg,     /* 500 */
-        darkred 300deg 330deg,    /* 1000 */
-        purple 330deg 360deg      /* 5000 */
-      );
+      background:
+        conic-gradient(
+          /* setores 8x 45° */
+          red 0deg 45deg,           /* Boa Sorte */
+          green 45deg 90deg,        /* 10 */
+          darkred 90deg 135deg,     /* 1000 */
+          blue 135deg 180deg,       /* 100 */
+          purple 180deg 225deg,     /* 5000 */
+          red 225deg 270deg,        /* Boa Sorte */
+          yellow 270deg 315deg,     /* 500 */
+          orange 315deg 360deg      /* 10000 */
+        );
     }
     .roleta .valor {
       position: absolute;
@@ -62,17 +61,22 @@
       left: 0;
       transform-origin: bottom center;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 16px;
+      color: white;
+      text-shadow: 1px 1px 3px black;
+      user-select: none;
     }
     .botao-girar {
-      margin-top: 30px;
-      padding: 12px 30px;
-      font-size: 18px;
+      margin-top: 40px;
+      padding: 15px 35px;
+      font-size: 20px;
       background-color: #e17055;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
     }
     .botao-girar:hover { background-color: #d35400; }
 
@@ -88,20 +92,28 @@
     }
     .modal-conteudo {
       background: white;
-      padding: 30px;
+      padding: 30px 40px;
       text-align: center;
-      border-radius: 12px;
+      border-radius: 14px;
       max-width: 90%;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+      font-size: 18px;
+      color: #333;
     }
     .modal-conteudo button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background: green;
+      margin-top: 25px;
+      padding: 12px 28px;
+      font-size: 18px;
+      background: #2ecc71;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+      transition: background-color 0.3s;
+    }
+    .modal-conteudo button:hover {
+      background: #27ae60;
     }
   </style>
 </head>
@@ -112,89 +124,130 @@
     <div class="roleta" id="roleta"></div>
   </div>
 
-  <button class="botao-girar" onclick="girarRoleta()">GIRAR</button>
+  <button class="botao-girar" id="btnGirar">GIRAR</button>
 
   <div class="modal" id="modal">
     <div class="modal-conteudo" id="modal-conteudo">
-      <p>Parabéns!</p>
-      <p id="msg-extra"></p>
-      <button id="botao-modal">Registar</button>
+      <p id="msgPrincipal">Parabéns!</p>
+      <p id="msgExtra"></p>
+      <button id="botao-modal">OK</button>
     </div>
   </div>
 
   <audio id="som-vitoria" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f1cf2ed8ab.mp3" preload="auto"></audio>
 
-  <script>
-    const setores = [
-      'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
-      '1000 Meticais', '5000 Meticais',
-      'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
-      '1000 Meticais', '5000 Meticais'
-    ];
-    const roleta = document.getElementById('roleta');
-    const somVitoria = document.getElementById('som-vitoria');
-    const extraMsg = document.getElementById('msg-extra');
-    let tentativas = 0;
-    let anguloAtual = 0;
+<script>
+  // Setores na ordem correta
+  const setores = [
+    { texto: 'Boa Sorte', cor: 'red' },        // 0
+    { texto: '10 Meticais', cor: 'green' },   // 1
+    { texto: '1000 Meticais', cor: 'darkred' }, // 2
+    { texto: '100 Meticais', cor: 'blue' },   // 3
+    { texto: '5000 Meticais', cor: 'purple' }, // 4
+    { texto: 'Boa Sorte', cor: 'red' },        // 5
+    { texto: '500 Meticais', cor: 'yellow' }, // 6
+    { texto: '10000 Meticais', cor: 'orange' } // 7
+  ];
 
-    // Inserir textos na roleta
-    setores.forEach((texto, i) => {
-      const div = document.createElement('div');
-      div.classList.add('valor');
-      div.style.transform = `rotate(${i * 30}deg) translateY(-180px)`;
-      div.innerText = texto;
-      roleta.appendChild(div);
-    });
+  const roleta = document.getElementById('roleta');
+  const somVitoria = document.getElementById('som-vitoria');
+  const modal = document.getElementById('modal');
+  const msgPrincipal = document.getElementById('msgPrincipal');
+  const msgExtra = document.getElementById('msgExtra');
+  const botaoModal = document.getElementById('botao-modal');
+  const btnGirar = document.getElementById('btnGirar');
 
-    function girarRoleta() {
-      if (tentativas >= 2) return;
+  let tentativas = 0;
+  let anguloAtual = 0;
 
-      const giros = 5;
-      let alvo;
+  // Inserir textos na roleta com posição correta
+  setores.forEach((setor, i) => {
+    const div = document.createElement('div');
+    div.classList.add('valor');
+    // Cada setor ocupa 45 graus, texto posicionado no meio (22.5° + i*45°)
+    const anguloTexto = i * 45 + 22.5;
+    div.style.transform = `rotate(${anguloTexto}deg) translateY(-190px) rotate(${ -anguloTexto }deg)`;
+    div.style.color = 'white';
+    div.innerText = setor.texto;
+    roleta.appendChild(div);
+  });
 
-      if (tentativas === 0) {
-        alvo = setores.findIndex(s => s === 'Boa Sorte');
+  function girarRoleta() {
+    if (tentativas >= 3) return; // máximo 3 giros
+
+    const giros = 6; // volta completa * 6 para giro visual
+
+    let alvoIndex;
+
+    if (tentativas === 0) {
+      // 1º giro: sempre parar no Boa Sorte (índice 0 ou 5) — vamos no 0
+      alvoIndex = 0;
+    } else if (tentativas === 1) {
+      // 2º giro: parar entre 5000 (índice 4) e 10000 (índice 7) aleatório
+      const opcoes = [4, 7];
+      alvoIndex = opcoes[Math.floor(Math.random() * opcoes.length)];
+    } else {
+      // 3º giro: pode parar aleatório em qualquer índice (pra mostrar parabéns)
+      alvoIndex = Math.floor(Math.random() * setores.length);
+    }
+
+    // Calcula o ângulo para o alvo (lembrando que a seta está fixa à esquerda)
+    // Para a seta à esquerda (270° no círculo), ajustamos para que setor alvo fique alinhado na seta:
+    // Setor i começa em i*45°, termina em (i+1)*45°, centro em i*45+22.5°
+    // Queremos que o centro do setor fique apontado na seta a 270°, então rotacionamos até 270 - centro do setor
+    const anguloAlvo = 270 - (alvoIndex * 45 + 22.5);
+
+    // Girar roleta (acrescentar giros completos para animação)
+    const destino = giros * 360 + anguloAlvo;
+    anguloAtual += destino;
+
+    roleta.style.transition = 'transform 5s cubic-bezier(0.33, 1, 0.68, 1)';
+    roleta.style.transform = `rotate(${anguloAtual}deg)`;
+
+    btnGirar.disabled = true;
+
+    setTimeout(() => {
+      tentativas++;
+
+      if (tentativas === 1) {
+        mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
+      } else if (tentativas === 2) {
+        const premio = setores[alvoIndex].texto;
+        somVitoria.play();
+        mostrarModal(
+          `Parabéns! Você ganhou ${premio} 🎉`,
+          'Girar Novamente',
+          ''
+        );
       } else {
-        const indices5000 = setores.map((s, i) => s === '5000 Meticais' ? i : -1).filter(i => i !== -1);
-        alvo = indices5000[Math.floor(Math.random() * indices5000.length)];
+        somVitoria.play();
+        mostrarModal(
+          'Parabéns! Última chance para registar seu prêmio!',
+          'Registar',
+          'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
+        );
       }
 
-      const destino = 360 * giros + (360 - alvo * 30);
-      anguloAtual += destino;
-      roleta.style.transform = `rotate(${anguloAtual}deg)`;
+      btnGirar.disabled = false;
+    }, 5200);
+  }
 
-      setTimeout(() => {
-        tentativas++;
-        if (tentativas === 1) {
-          mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
-        } else {
-          somVitoria.play();
-          mostrarModal(
-            'Parabéns! Você ganhou até 5000 Meticais 🎉',
-            'Registar',
-            'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
-          );
-        }
-      }, 5200);
-    }
+  function mostrarModal(msg, botaoTexto, msgExtra) {
+    msgPrincipal.innerText = msg;
+    msgExtra.innerText = msgExtra;
+    botaoModal.innerText = botaoTexto;
 
-    function mostrarModal(msg, botaoTexto, msgExtra = '') {
-      const modal = document.getElementById('modal');
-      const conteudo = document.getElementById('modal-conteudo');
-      conteudo.querySelector('p').innerText = msg;
-      document.getElementById('msg-extra').innerText = msgExtra;
+    modal.style.display = 'flex';
 
-      const botao = conteudo.querySelector('button');
-      botao.innerText = botaoTexto;
-      botao.onclick = () => {
-        modal.style.display = 'none';
-        if (botaoTexto === 'Registar') {
-          window.location.href = "https://is.gd/hHdRiZ";
-        }
-      };
+    botaoModal.onclick = () => {
+      modal.style.display = 'none';
+      if (botaoTexto === 'Registar') {
+        window.location.href = "https://is.gd/hHdRiZ";
+      }
+    };
+  }
 
-      modal.style.display = 'flex';
-    }
-  </script>
+  btnGirar.addEventListener('click', girarRoleta);
+</script>
 </body>
-</html>
+  </html>
