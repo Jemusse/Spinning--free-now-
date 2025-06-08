@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="pt">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Roleta Realista</title>
@@ -45,18 +46,18 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 12px solid gold;
+      border: 14px solid gold;
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
       background: conic-gradient(
-        yellow 0deg 45deg,
+        red 0deg 45deg,
         green 45deg 90deg,
         blue 90deg 135deg,
         red 135deg 180deg,
         green 180deg 225deg,
         blue 225deg 270deg,
         red 270deg 315deg,
-        green 315deg 360deg
+        yellow 315deg 360deg
       );
     }
     .roleta .valor {
@@ -64,16 +65,16 @@
       width: 100%;
       text-align: center;
       top: 50%;
-      left: 0;
-      transform-origin: bottom center;
+      left: 50%;
+      transform-origin: center bottom;
       font-weight: bold;
-      font-size: 24px;
+      font-size: 26px;
       writing-mode: vertical-rl;
-      transform: rotate(var(--angle)) translateY(-240px);
+      transform: rotate(var(--angle)) translate(-50%, -260px);
     }
     .botao-girar {
       margin-top: 40px;
-      padding: 14px 36px;
+      padding: 16px 38px;
       font-size: 20px;
       background-color: #e17055;
       color: white;
@@ -131,67 +132,69 @@
   <audio id="som-vitoria" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f1cf2ed8ab.mp3" preload="auto"></audio>
   <script>
     const setores = [
-      '10 Meticais', '100 Meticais', '500 Meticais', '1000 Meticais', '5000 Meticais', '10000 Meticais', 'Boa Sorte', 'Boa Sorte'
+      '10 Meticais', '100 Meticais', '500 Meticais', '1000 Meticais',
+      '5000 Meticais', '10000 Meticais', 'Boa Sorte', 'Boa Sorte'
     ];
     const roleta = document.getElementById('roleta');
     const somVitoria = document.getElementById('som-vitoria');
     const extraMsg = document.getElementById('msg-extra');
     let tentativas = 0;
-    let anguloAtual = 0;setores.forEach((texto, i) => {
-  const div = document.createElement('div');
-  div.classList.add('valor');
-  div.innerText = texto;
-  div.style.setProperty('--angle', `${i * 45}deg`);
-  roleta.appendChild(div);
-});
+    let anguloAtual = 0;
 
-function girarRoleta() {
-  if (tentativas >= 2) return;
+    setores.forEach((texto, i) => {
+      const div = document.createElement('div');
+      div.classList.add('valor');
+      div.innerText = texto;
+      div.style.setProperty('--angle', `${i * 45}deg`);
+      roleta.appendChild(div);
+    });
 
-  const giros = 5;
-  let alvo;
+    function girarRoleta() {
+      if (tentativas >= 2) return;
 
-  if (tentativas === 0) {
-    alvo = setores.lastIndexOf('Boa Sorte');
-  } else {
-    alvo = setores.findIndex(s => s === '10000 Meticais');
-  }
+      const giros = 5;
+      let alvo;
 
-  const destino = 360 * giros + (360 - alvo * 45);
-  anguloAtual += destino;
-  roleta.style.transform = `rotate(${anguloAtual}deg)`;
+      if (tentativas === 0) {
+        alvo = setores.lastIndexOf('Boa Sorte');
+      } else {
+        alvo = setores.findIndex(s => s === '10000 Meticais');
+      }
 
-  setTimeout(() => {
-    tentativas++;
-    if (tentativas === 1) {
-      mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
-    } else {
-      somVitoria.play();
-      mostrarModal(
-        'Parabéns! Você ganhou 10000 Meticais 🎉',
-        'Registar',
-        'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
-      );
+      const destino = 360 * giros + (360 - alvo * 45);
+      anguloAtual += destino;
+      roleta.style.transform = `rotate(${anguloAtual}deg)`;
+
+      setTimeout(() => {
+        tentativas++;
+        if (tentativas === 1) {
+          mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
+        } else {
+          somVitoria.play();
+          mostrarModal(
+            'Parabéns! Você ganhou 10000 Meticais 🎉',
+            'Registar',
+            'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
+          );
+        }
+      }, 5200);
     }
-  }, 5200);
-}
 
-function mostrarModal(msg, botaoTexto, msgExtra = '') {
-  const modal = document.getElementById('modal');
-  const conteudo = document.getElementById('modal-conteudo');
-  conteudo.querySelector('p').innerText = msg;
-  document.getElementById('msg-extra').innerText = msgExtra;
-  const botao = conteudo.querySelector('button');
-  botao.innerText = botaoTexto;
-  botao.onclick = () => {
-    modal.style.display = 'none';
-    if (botaoTexto === 'Registar') {
-      window.location.href = "https://is.gd/hHdRiZ";
+    function mostrarModal(msg, botaoTexto, msgExtra = '') {
+      const modal = document.getElementById('modal');
+      const conteudo = document.getElementById('modal-conteudo');
+      conteudo.querySelector('p').innerText = msg;
+      document.getElementById('msg-extra').innerText = msgExtra;
+      const botao = conteudo.querySelector('button');
+      botao.innerText = botaoTexto;
+      botao.onclick = () => {
+        modal.style.display = 'none';
+        if (botaoTexto === 'Registar') {
+          window.location.href = "https://is.gd/hHdRiZ";
+        }
+      };
+      modal.style.display = 'flex';
     }
-  };
-  modal.style.display = 'flex';
-}
-
   </script>
 </body>
-  </html>
+</html>
