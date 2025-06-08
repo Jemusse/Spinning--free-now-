@@ -2,26 +2,24 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Roleta da Sorte</title>
+  <title>Roleta Realista</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      padding: 0;
-      background: linear-gradient(to bottom, #ffeaa7, #fab1a0);
+      background: linear-gradient(to bottom, #ff9ff3, #feca57);
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      font-family: Arial, sans-serif;
     }
-
     .roleta-container {
       position: relative;
       width: 400px;
       height: 400px;
     }
-
     .seta {
       position: absolute;
       left: -40px;
@@ -34,7 +32,6 @@
       border-right: 40px solid red;
       z-index: 10;
     }
-
     .roleta {
       width: 100%;
       height: 100%;
@@ -43,22 +40,30 @@
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
       background: conic-gradient(
-        #ffeaa7 0deg 45deg, #fdcb6e 45deg 90deg,
-        #ffeaa7 90deg 135deg, #fdcb6e 135deg 180deg,
-        #ffeaa7 180deg 225deg, #fdcb6e 225deg 270deg,
-        #ffeaa7 270deg 315deg, #fdcb6e 315deg 360deg
+        red 0deg 30deg,           /* Boa Sorte */
+        green 30deg 60deg,        /* 10 */
+        blue 60deg 90deg,         /* 100 */
+        yellow 90deg 120deg,      /* 500 */
+        darkred 120deg 150deg,    /* 1000 */
+        purple 150deg 180deg,     /* 5000 */
+        red 180deg 210deg,        /* Boa Sorte */
+        green 210deg 240deg,      /* 10 */
+        blue 240deg 270deg,       /* 100 */
+        yellow 270deg 300deg,     /* 500 */
+        darkred 300deg 330deg,    /* 1000 */
+        purple 330deg 360deg      /* 5000 */
       );
     }
-
-    .valor {
+    .roleta .valor {
       position: absolute;
       width: 100%;
       text-align: center;
       top: 50%;
+      left: 0;
       transform-origin: bottom center;
       font-weight: bold;
+      font-size: 14px;
     }
-
     .botao-girar {
       margin-top: 30px;
       padding: 12px 30px;
@@ -68,12 +73,8 @@
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
     }
-
-    .botao-girar:hover {
-      background-color: #d35400;
-    }
+    .botao-girar:hover { background-color: #d35400; }
 
     .modal {
       position: fixed;
@@ -85,14 +86,13 @@
       justify-content: center;
       z-index: 100;
     }
-
     .modal-conteudo {
       background: white;
       padding: 30px;
       text-align: center;
       border-radius: 12px;
+      max-width: 90%;
     }
-
     .modal-conteudo button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -109,9 +109,7 @@
 
   <div class="roleta-container">
     <div class="seta"></div>
-    <div class="roleta" id="roleta">
-      <!-- Os textos serão inseridos por JavaScript -->
-    </div>
+    <div class="roleta" id="roleta"></div>
   </div>
 
   <button class="botao-girar" onclick="girarRoleta()">GIRAR</button>
@@ -119,6 +117,7 @@
   <div class="modal" id="modal">
     <div class="modal-conteudo" id="modal-conteudo">
       <p>Parabéns!</p>
+      <p id="msg-extra"></p>
       <button id="botao-modal">Registar</button>
     </div>
   </div>
@@ -126,17 +125,23 @@
   <audio id="som-vitoria" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_f1cf2ed8ab.mp3" preload="auto"></audio>
 
   <script>
-    const setores = ['10 Meticais', '100 Meticais', '200 Meticais', '500 Meticais', '1000 Meticais', 'Boa Sorte', '5000 Meticais', '10000 Meticais'];
+    const setores = [
+      'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
+      '1000 Meticais', '5000 Meticais',
+      'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
+      '1000 Meticais', '5000 Meticais'
+    ];
     const roleta = document.getElementById('roleta');
     const somVitoria = document.getElementById('som-vitoria');
+    const extraMsg = document.getElementById('msg-extra');
     let tentativas = 0;
     let anguloAtual = 0;
 
-    // Criar textos
+    // Inserir textos na roleta
     setores.forEach((texto, i) => {
       const div = document.createElement('div');
       div.classList.add('valor');
-      div.style.transform = `rotate(${i * 45}deg) translateY(-180px)`;
+      div.style.transform = `rotate(${i * 30}deg) translateY(-180px)`;
       div.innerText = texto;
       roleta.appendChild(div);
     });
@@ -148,35 +153,39 @@
       let alvo;
 
       if (tentativas === 0) {
-        alvo = setores.indexOf('Boa Sorte');
-      } else if (tentativas === 1) {
-        alvo = Math.random() < 0.5 ? setores.indexOf('5000 Meticais') : setores.indexOf('10000 Meticais');
+        alvo = setores.findIndex(s => s === 'Boa Sorte');
+      } else {
+        const indices5000 = setores.map((s, i) => s === '5000 Meticais' ? i : -1).filter(i => i !== -1);
+        alvo = indices5000[Math.floor(Math.random() * indices5000.length)];
       }
 
-      const anguloDestino = 360 * giros + (360 - alvo * 45) + Math.floor(Math.random() * 20 - 10);
-      anguloAtual += anguloDestino;
-
+      const destino = 360 * giros + (360 - alvo * 30);
+      anguloAtual += destino;
       roleta.style.transform = `rotate(${anguloAtual}deg)`;
 
       setTimeout(() => {
         tentativas++;
-
         if (tentativas === 1) {
           mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
-        } else if (tentativas === 2) {
+        } else {
           somVitoria.play();
-          mostrarModal('Parabéns! Você ganhou até 10.000 Meticais 🎉', 'Registar');
+          mostrarModal(
+            'Parabéns! Você ganhou até 5000 Meticais 🎉',
+            'Registar',
+            'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
+          );
         }
       }, 5200);
     }
 
-    function mostrarModal(msg, botaoTexto) {
+    function mostrarModal(msg, botaoTexto, msgExtra = '') {
       const modal = document.getElementById('modal');
       const conteudo = document.getElementById('modal-conteudo');
       conteudo.querySelector('p').innerText = msg;
+      document.getElementById('msg-extra').innerText = msgExtra;
+
       const botao = conteudo.querySelector('button');
       botao.innerText = botaoTexto;
-
       botao.onclick = () => {
         modal.style.display = 'none';
         if (botaoTexto === 'Registar') {
