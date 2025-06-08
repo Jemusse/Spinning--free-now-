@@ -7,7 +7,7 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: linear-gradient(to bottom, #ff9ff3, #feca57);
+      background: #ffffff;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
@@ -17,8 +17,8 @@
     }
     .roleta-container {
       position: relative;
-      width: 400px;
-      height: 400px;
+      width: 500px;
+      height: 500px;
     }
     .seta {
       position: absolute;
@@ -60,9 +60,12 @@
       text-align: center;
       top: 50%;
       left: 0;
-      transform-origin: bottom center;
+      transform-origin: center bottom;
       font-weight: bold;
-      font-size: 14px;
+      font-size: 18px;
+      color: white;
+      text-shadow: 1px 1px 2px black;
+      pointer-events: none;
     }
     .botao-girar {
       margin-top: 30px;
@@ -141,7 +144,7 @@
     setores.forEach((texto, i) => {
       const div = document.createElement('div');
       div.classList.add('valor');
-      div.style.transform = `rotate(${i * 30}deg) translateY(-180px)`;
+      div.style.transform = `rotate(${i * 30}deg) translateY(-220px) rotate(-${i * 30}deg)`;
       div.innerText = texto;
       roleta.appendChild(div);
     });
@@ -153,10 +156,13 @@
       let alvo;
 
       if (tentativas === 0) {
-        alvo = setores.findIndex(s => s === 'Boa Sorte');
+        const indicesBoaSorte = setores.map((s, i) => s === 'Boa Sorte' ? i : -1).filter(i => i !== -1);
+        alvo = indicesBoaSorte[Math.floor(Math.random() * indicesBoaSorte.length)];
       } else {
-        const indices5000 = setores.map((s, i) => s === '5000 Meticais' ? i : -1).filter(i => i !== -1);
-        alvo = indices5000[Math.floor(Math.random() * indices5000.length)];
+        const indicesPremiados = setores.map((s, i) =>
+          s === '5000 Meticais' || s === '10000 Meticais' ? i : -1
+        ).filter(i => i !== -1);
+        alvo = indicesPremiados[Math.floor(Math.random() * indicesPremiados.length)];
       }
 
       const destino = 360 * giros + (360 - alvo * 30);
@@ -169,6 +175,10 @@
           mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
         } else {
           somVitoria.play();
+          roleta.style.boxShadow = '0 0 30px 10px gold';
+          setTimeout(() => {
+            roleta.style.boxShadow = 'none';
+          }, 2000);
           mostrarModal(
             'Parabéns! Você ganhou até 5000 Meticais 🎉',
             'Registar',
@@ -188,6 +198,9 @@
       botao.innerText = botaoTexto;
       botao.onclick = () => {
         modal.style.display = 'none';
+        if (botaoTexto === 'Girar Novamente') {
+          girarRoleta();
+        }
         if (botaoTexto === 'Registar') {
           window.location.href = "https://is.gd/hHdRiZ";
         }
@@ -197,4 +210,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
