@@ -27,19 +27,19 @@
     }
     .roleta-container {
       position: relative;
-      width: 500px;
-      height: 500px;
+      width: 600px;
+      height: 600px;
     }
     .seta {
       position: absolute;
-      right: -50px;
+      right: -60px;
       top: 50%;
       transform: translateY(-50%);
       width: 0;
       height: 0;
-      border-top: 25px solid transparent;
-      border-bottom: 25px solid transparent;
-      border-left: 50px solid red;
+      border-top: 30px solid transparent;
+      border-bottom: 30px solid transparent;
+      border-left: 60px solid red;
       z-index: 10;
     }
     .roleta {
@@ -50,14 +50,14 @@
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
       background: conic-gradient(
-        red 0deg 45deg,
+        yellow 0deg 45deg,
         green 45deg 90deg,
         blue 90deg 135deg,
         red 135deg 180deg,
         green 180deg 225deg,
         blue 225deg 270deg,
         red 270deg 315deg,
-        yellow 315deg 360deg
+        green 315deg 360deg
       );
     }
     .roleta .valor {
@@ -68,9 +68,9 @@
       left: 0;
       transform-origin: bottom center;
       font-weight: bold;
-      font-size: 22px;
+      font-size: 24px;
       writing-mode: vertical-rl;
-      transform: rotate(var(--angle)) translateY(-200px);
+      transform: rotate(var(--angle)) translateY(-240px);
     }
     .botao-girar {
       margin-top: 40px;
