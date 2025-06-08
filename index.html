@@ -12,14 +12,30 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
+      padding-top: 30px;
+      text-align: center;
     }
+
+    h1 {
+      font-size: 36px;
+      color: #d63031;
+      margin: 10px 0 5px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #2d3436;
+      margin-bottom: 20px;
+    }
+
     .roleta-container {
       position: relative;
       width: 500px;
       height: 500px;
     }
+
     .seta {
       position: absolute;
       left: -40px;
@@ -32,6 +48,7 @@
       border-right: 40px solid red;
       z-index: 10;
     }
+
     .roleta {
       width: 100%;
       height: 100%;
@@ -40,20 +57,21 @@
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
       background: conic-gradient(
-        red 0deg 30deg,           /* Boa Sorte */
-        green 30deg 60deg,        /* 10 */
-        blue 60deg 90deg,         /* 100 */
-        yellow 90deg 120deg,      /* 500 */
-        darkred 120deg 150deg,    /* 1000 */
-        purple 150deg 180deg,     /* 5000 */
-        red 180deg 210deg,        /* Boa Sorte */
-        green 210deg 240deg,      /* 10 */
-        blue 240deg 270deg,       /* 100 */
-        yellow 270deg 300deg,     /* 500 */
-        darkred 300deg 330deg,    /* 1000 */
-        purple 330deg 360deg      /* 5000 */
+        red 0deg 30deg,
+        green 30deg 60deg,
+        blue 60deg 90deg,
+        yellow 90deg 120deg,
+        darkred 120deg 150deg,
+        purple 150deg 180deg,
+        red 180deg 210deg,
+        green 210deg 240deg,
+        blue 240deg 270deg,
+        yellow 270deg 300deg,
+        darkred 300deg 330deg,
+        purple 330deg 360deg
       );
     }
+
     .roleta .valor {
       position: absolute;
       width: 100%;
@@ -67,6 +85,7 @@
       text-shadow: 1px 1px 2px black;
       pointer-events: none;
     }
+
     .botao-girar {
       margin-top: 30px;
       padding: 12px 30px;
@@ -77,7 +96,10 @@
       border-radius: 10px;
       cursor: pointer;
     }
-    .botao-girar:hover { background-color: #d35400; }
+
+    .botao-girar:hover {
+      background-color: #d35400;
+    }
 
     .modal {
       position: fixed;
@@ -89,6 +111,7 @@
       justify-content: center;
       z-index: 100;
     }
+
     .modal-conteudo {
       background: white;
       padding: 30px;
@@ -96,6 +119,7 @@
       border-radius: 12px;
       max-width: 90%;
     }
+
     .modal-conteudo button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -109,6 +133,9 @@
   </style>
 </head>
 <body>
+
+  <h1>Tente a sua sorte</h1>
+  <h2>Clica no botão e gire a roleta da sorte para ganhar prêmios!</h2>
 
   <div class="roleta-container">
     <div class="seta"></div>
@@ -134,13 +161,14 @@
       'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
       '1000 Meticais', '5000 Meticais'
     ];
+
     const roleta = document.getElementById('roleta');
     const somVitoria = document.getElementById('som-vitoria');
     const extraMsg = document.getElementById('msg-extra');
     let tentativas = 0;
     let anguloAtual = 0;
 
-    // Inserir textos na roleta
+    // Inserir textos nos setores da roleta
     setores.forEach((texto, i) => {
       const div = document.createElement('div');
       div.classList.add('valor');
@@ -160,7 +188,7 @@
         alvo = indicesBoaSorte[Math.floor(Math.random() * indicesBoaSorte.length)];
       } else {
         const indicesPremiados = setores.map((s, i) =>
-          s === '5000 Meticais' || s === '10000 Meticais' ? i : -1
+          s === '5000 Meticais' ? i : -1
         ).filter(i => i !== -1);
         alvo = indicesPremiados[Math.floor(Math.random() * indicesPremiados.length)];
       }
