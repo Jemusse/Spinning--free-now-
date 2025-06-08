@@ -7,27 +7,26 @@
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #ffffff;
+      background: white;
       font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       height: 100vh;
-      padding-top: 30px;
-      text-align: center;
+      padding-top: 20px;
     }
 
     h1 {
-      font-size: 36px;
-      color: #d63031;
-      margin: 10px 0 5px;
+      font-size: 32px;
+      color: #e74c3c;
+      margin-bottom: 5px;
     }
 
     h2 {
       font-size: 18px;
       color: #2d3436;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
     }
 
     .roleta-container {
@@ -38,14 +37,14 @@
 
     .seta {
       position: absolute;
-      left: -40px;
+      left: -50px;
       top: 50%;
       transform: translateY(-50%);
       width: 0;
       height: 0;
-      border-top: 20px solid transparent;
-      border-bottom: 20px solid transparent;
-      border-right: 40px solid red;
+      border-top: 25px solid transparent;
+      border-bottom: 25px solid transparent;
+      border-right: 50px solid red;
       z-index: 10;
     }
 
@@ -53,22 +52,18 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
-      border: 10px solid gold;
+      border: 12px solid gold;
       position: relative;
       transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
       background: conic-gradient(
-        red 0deg 30deg,
-        green 30deg 60deg,
-        blue 60deg 90deg,
-        yellow 90deg 120deg,
-        darkred 120deg 150deg,
-        purple 150deg 180deg,
-        red 180deg 210deg,
-        green 210deg 240deg,
-        blue 240deg 270deg,
-        yellow 270deg 300deg,
-        darkred 300deg 330deg,
-        purple 330deg 360deg
+        red 0deg 45deg,           /* Boa Sorte */
+        green 45deg 90deg,        /* 10 */
+        blue 90deg 135deg,        /* 100 */
+        yellow 135deg 180deg,     /* 500 */
+        green 180deg 225deg,      /* 1000 */
+        yellow 225deg 270deg,     /* 5000 */
+        red 270deg 315deg,        /* 10000 */
+        purple 315deg 360deg      /* Repetição / Espaço extra */
       );
     }
 
@@ -78,22 +73,19 @@
       text-align: center;
       top: 50%;
       left: 0;
-      transform-origin: center bottom;
+      transform-origin: bottom center;
       font-weight: bold;
       font-size: 18px;
-      color: white;
-      text-shadow: 1px 1px 2px black;
-      pointer-events: none;
     }
 
     .botao-girar {
-      margin-top: 30px;
-      padding: 12px 30px;
-      font-size: 18px;
+      margin-top: 40px;
+      padding: 14px 36px;
+      font-size: 20px;
       background-color: #e17055;
       color: white;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
     }
 
@@ -157,22 +149,19 @@
   <script>
     const setores = [
       'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
-      '1000 Meticais', '5000 Meticais',
-      'Boa Sorte', '10 Meticais', '100 Meticais', '500 Meticais',
-      '1000 Meticais', '5000 Meticais'
+      '1000 Meticais', '5000 Meticais', '10000 Meticais', 'Espaço'
     ];
-
     const roleta = document.getElementById('roleta');
     const somVitoria = document.getElementById('som-vitoria');
     const extraMsg = document.getElementById('msg-extra');
     let tentativas = 0;
     let anguloAtual = 0;
 
-    // Inserir textos nos setores da roleta
+    // Inserir textos na roleta
     setores.forEach((texto, i) => {
       const div = document.createElement('div');
       div.classList.add('valor');
-      div.style.transform = `rotate(${i * 30}deg) translateY(-220px) rotate(-${i * 30}deg)`;
+      div.style.transform = `rotate(${i * 45}deg) translateY(-210px)`;
       div.innerText = texto;
       roleta.appendChild(div);
     });
@@ -184,16 +173,15 @@
       let alvo;
 
       if (tentativas === 0) {
-        const indicesBoaSorte = setores.map((s, i) => s === 'Boa Sorte' ? i : -1).filter(i => i !== -1);
-        alvo = indicesBoaSorte[Math.floor(Math.random() * indicesBoaSorte.length)];
+        alvo = setores.findIndex(s => s === 'Boa Sorte');
       } else {
-        const indicesPremiados = setores.map((s, i) =>
-          s === '5000 Meticais' ? i : -1
+        const alvos = setores.map((s, i) =>
+          s === '5000 Meticais' || s === '10000 Meticais' ? i : -1
         ).filter(i => i !== -1);
-        alvo = indicesPremiados[Math.floor(Math.random() * indicesPremiados.length)];
+        alvo = alvos[Math.floor(Math.random() * alvos.length)];
       }
 
-      const destino = 360 * giros + (360 - alvo * 30);
+      const destino = 360 * giros + (360 - alvo * 45);
       anguloAtual += destino;
       roleta.style.transform = `rotate(${anguloAtual}deg)`;
 
@@ -203,12 +191,8 @@
           mostrarModal('Resultado: Boa Sorte!', 'Girar Novamente');
         } else {
           somVitoria.play();
-          roleta.style.boxShadow = '0 0 30px 10px gold';
-          setTimeout(() => {
-            roleta.style.boxShadow = 'none';
-          }, 2000);
           mostrarModal(
-            'Parabéns! Você ganhou até 5000 Meticais 🎉',
+            'Parabéns! Você ganhou até 5000 ou 10000 Meticais 🎉',
             'Registar',
             'Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.'
           );
@@ -226,9 +210,6 @@
       botao.innerText = botaoTexto;
       botao.onclick = () => {
         modal.style.display = 'none';
-        if (botaoTexto === 'Girar Novamente') {
-          girarRoleta();
-        }
         if (botaoTexto === 'Registar') {
           window.location.href = "https://is.gd/hHdRiZ";
         }
