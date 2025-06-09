@@ -36,10 +36,9 @@
       margin: 0 auto;
       border-radius: 50%;
       box-shadow: 0 0 15px gold;
-      border: 8px solid #b8860b; /* aro dourado */
+      border: 8px solid #b8860b;
       overflow: hidden;
       background: white;
-      transition: width 0.3s ease, height 0.3s ease;
     }
     #canvas {
       display: block;
@@ -51,16 +50,15 @@
     .seta {
       position: absolute;
       top: 50%;
-      right: -50px; /* afastado da roleta */
-      width: 0; 
-      height: 0; 
+      right: -50px;
+      width: 0;
+      height: 0;
       border-left: 30px solid transparent;
       border-right: 30px solid transparent;
       border-bottom: 40px solid red;
       transform: translateY(-50%);
       filter: drop-shadow(1px 1px 2px #880000);
       z-index: 10;
-      transition: right 0.3s ease;
     }
     button#girar {
       margin-top: 30px;
@@ -73,7 +71,6 @@
       border-radius: 10px;
       cursor: pointer;
       box-shadow: 0 5px 0 #c66d00;
-      transition: background-color 0.3s;
     }
     button#girar:disabled {
       background-color: #ccc;
@@ -106,7 +103,6 @@
       background-color: #34c759;
     }
 
-    /* Responsivo para celular */
     @media (max-width: 400px) {
       .roleta {
         width: 280px;
@@ -144,10 +140,13 @@
     <div class="mensagem" id="mensagem"></div>
   </div>
 
-  <!-- Áudio de giro -->
+  <!-- Áudios -->
   <audio id="audio-giro" loop>
     <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
-    Seu navegador não suporta áudio.
+  </audio>
+
+  <audio id="audio-campainha">
+    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
   </audio>
 
   <script>
@@ -156,16 +155,17 @@
     const btnGirar = document.getElementById('girar');
     const mensagem = document.getElementById('mensagem');
     const audioGiro = document.getElementById('audio-giro');
+    const audioCampainha = document.getElementById('audio-campainha');
 
     const premios = [
-      { texto: '10 Meticais', cor: '#ff3b3b' },        // vermelho
-      { texto: '100 Meticais', cor: '#3bbf3b' },       // verde
-      { texto: '500 Meticais', cor: '#3b6fff' },       // azul
-      { texto: 'Boa Meticais Sorte', cor: '#f9d94c' }, // amarelo
-      { texto: '500 Meticais', cor: '#3bbf3b' },       // verde
-      { texto: '10000 Meticais', cor: '#3b6fff' },     // azul
-      { texto: '5000 Meticais', cor: '#ff3b3b' },      // vermelho
-      { texto: '1000 Meticais', cor: '#f9d94c' },      // amarelo
+      { texto: '10 Meticais', cor: '#ff3b3b' },
+      { texto: '100 Meticais', cor: '#3bbf3b' },
+      { texto: '500 Meticais', cor: '#3b6fff' },
+      { texto: 'Boa Meticais Sorte', cor: '#f9d94c' },
+      { texto: '500 Meticais', cor: '#3bbf3b' },
+      { texto: '10000 Meticais', cor: '#3b6fff' },
+      { texto: '5000 Meticais', cor: '#ff3b3b' },
+      { texto: '1000 Meticais', cor: '#f9d94c' },
     ];
 
     const numFatias = premios.length;
@@ -175,7 +175,6 @@
     let tentativas = 0;
     const maxTentativas = 2;
 
-    // Desenha a roleta com fatias e texto
     function desenharRoleta() {
       const centroX = canvas.width / 2;
       const centroY = canvas.height / 2;
@@ -187,7 +186,6 @@
         const inicioAng = i * anguloPorFat;
         const fimAng = inicioAng + anguloPorFat;
 
-        // Cor da fatia
         ctx.beginPath();
         ctx.moveTo(centroX, centroY);
         ctx.arc(centroX, centroY, raio, inicioAng, fimAng);
@@ -197,7 +195,6 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Texto da fatia
         ctx.save();
         ctx.translate(centroX, centroY);
         ctx.rotate(inicioAng + anguloPorFat / 2);
@@ -209,7 +206,6 @@
       }
     }
 
-    // Função para animar o giro
     function girarRoleta() {
       if(tentativas >= maxTentativas) {
         mensagem.textContent = 'Você já usou suas tentativas gratuitas!';
@@ -219,21 +215,16 @@
       btnGirar.disabled = true;
       mensagem.textContent = '';
 
-      // Começa o som
       audioGiro.currentTime = 0;
       audioGiro.play();
 
-      // Definir em qual fatia a roleta deve parar
       let fatiaDestino;
-
       if(tentativas === 0) {
         fatiaDestino = premios.findIndex(p => p.texto === 'Boa Meticais Sorte');
-      } else if(tentativas === maxTentativas -1) {
+      } else {
         const opcoes = ['5000 Meticais', '10000 Meticais'];
         const escolha = opcoes[Math.floor(Math.random() * opcoes.length)];
         fatiaDestino = premios.findIndex(p => p.texto === escolha);
-      } else {
-        fatiaDestino = Math.floor(Math.random() * numFatias);
       }
 
       const anguloDestino = (numFatias - fatiaDestino) * anguloPorFat - (anguloPorFat / 2);
@@ -264,14 +255,18 @@
       requestAnimationFrame(animar);
     }
 
-    // Mostrar o resultado com mensagem e botão registrar na última tentativa
     function mostrarResultado(index) {
       const premio = premios[index];
       if(tentativas === 0) {
         mensagem.textContent = `Parou em: ${premio.texto}! Boa sorte!`;
-      } else if(tentativas === maxTentativas -1) {
-        mensagem.innerHTML = `🎉 Parabéns! Você ganhou: <strong>${premio.texto}</strong>!<br><br>`;
-        mensagem.innerHTML += `<a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank" rel="noopener noreferrer">Registrar</a>`;
+      } else if(tentativas === maxTentativas - 1) {
+        audioCampainha.currentTime = 0;
+        audioCampainha.play();
+        mensagem.innerHTML = `
+          🎉 <strong>Parabéns por se tornar o novo vendedor!</strong><br><br>
+          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.<br><br>
+          <a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank" rel="noopener noreferrer">Registar</a>
+        `;
       } else {
         mensagem.textContent = `Você ganhou: ${premio.texto}!`;
       }
@@ -282,4 +277,4 @@
     desenharRoleta();
   </script>
 </body>
-  </html>
+</html>
