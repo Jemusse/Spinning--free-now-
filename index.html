@@ -1,148 +1,285 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Roleta de Meticais</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roleta de Prêmios Realista</title>
   <style>
     body {
-      background: #fff;
+      font-family: Arial, sans-serif;
       text-align: center;
-      font-family: sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 40px 0;
     }
-    #wheel-container {
+    .container {
+      max-width: 360px;
+      margin: 0 auto;
       position: relative;
-      width: 500px;
-      height: 500px;
-      margin: 40px auto;
+      padding: 0 10px;
     }
-    #wheel {
+    h1 {
+      margin-bottom: 10px;
+      font-size: 1.6rem;
+      color: #222;
+    }
+    .info-text {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .roleta {
+      position: relative;
+      width: 360px;
+      height: 360px;
+      margin: 0 auto;
+      border-radius: 50%;
+      box-shadow: 0 0 15px gold;
+      border: 8px solid #b8860b; /* aro dourado */
+      overflow: hidden;
+      background: white;
+      transition: width 0.3s ease, height 0.3s ease;
+    }
+    #canvas {
+      display: block;
+      margin: 0 auto;
+      border-radius: 50%;
       width: 100%;
       height: 100%;
-      border-radius: 50%;
-      border: 15px solid gold;
-      position: relative;
-      transition: transform 5s cubic-bezier(0.33, 1, 0.68, 1);
     }
-    .slice {
+    .seta {
       position: absolute;
-      width: 50%;
-      height: 50%;
-      background: red;
-      transform-origin: 100% 100%;
-      clip-path: polygon(100% 100%, 0% 100%, 100% 0%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-    }
-    #arrow {
-      width: 0;
-      height: 0;
-      border-top: 25px solid transparent;
-      border-bottom: 25px solid transparent;
-      border-left: 50px solid black;
-      position: absolute;
-      left: -50px;
       top: 50%;
+      right: -50px; /* afastado da roleta */
+      width: 0; 
+      height: 0; 
+      border-left: 30px solid transparent;
+      border-right: 30px solid transparent;
+      border-bottom: 40px solid red;
       transform: translateY(-50%);
+      filter: drop-shadow(1px 1px 2px #880000);
+      z-index: 10;
+      transition: right 0.3s ease;
     }
-    button {
-      margin-top: 20px;
-      padding: 12px 25px;
-      font-size: 18px;
-      border-radius: 8px;
+    button#girar {
+      margin-top: 30px;
+      background-color: #ff9500;
       border: none;
-      background: gold;
+      padding: 15px 40px;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      border-radius: 10px;
       cursor: pointer;
+      box-shadow: 0 5px 0 #c66d00;
+      transition: background-color 0.3s;
+    }
+    button#girar:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button#girar:hover:not(:disabled) {
+      background-color: #ffa733;
+    }
+    .mensagem {
+      margin-top: 30px;
+      font-size: 22px;
+      font-weight: 700;
+      min-height: 60px;
+      color: #333;
+    }
+    a#registrar-btn {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: #28a745;
+      color: white;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 0 #1f7a33;
+    }
+    a#registrar-btn:hover {
+      background-color: #34c759;
+    }
+
+    /* Responsivo para celular */
+    @media (max-width: 400px) {
+      .roleta {
+        width: 280px;
+        height: 280px;
+      }
+      .seta {
+        right: -40px;
+        border-left: 25px solid transparent;
+        border-right: 25px solid transparent;
+        border-bottom: 33px solid red;
+      }
+      button#girar {
+        font-size: 18px;
+        padding: 12px 30px;
+      }
+      .mensagem {
+        font-size: 18px;
+        min-height: 50px;
+      }
+      .info-text {
+        font-size: 1.1rem;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h1>Gira e Ganha Meticais!</h1>
-  <div id="wheel-container">
-    <div id="arrow"></div>
-    <div id="wheel"></div>
+  <div class="container">
+    <h1>Gire a Roleta e Ganhe!</h1>
+    <div class="info-text">Tente a sua sorte!</div>
+    <div class="roleta">
+      <canvas id="canvas" width="360" height="360"></canvas>
+      <div class="seta" title="Seta Indicadora"></div>
+    </div>
+    <button id="girar">GIRAR</button>
+    <div class="mensagem" id="mensagem"></div>
   </div>
-  <button id="spin">GIRAR</button>
+
+  <!-- Áudio de giro -->
+  <audio id="audio-giro" loop>
+    <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
+    Seu navegador não suporta áudio.
+  </audio>
 
   <script>
-    const slices = [
-      { label: 'Boa Sorte', color: 'red' },
-      { label: '10', color: 'green' },
-      { label: '100', color: 'blue' },
-      { label: '500', color: 'yellow' },
-      { label: '1000', color: 'green' },
-      { label: '5000', color: 'yellow' },
-      { label: '10000', color: 'red' },
-      { label: '10', color: 'green' }
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const btnGirar = document.getElementById('girar');
+    const mensagem = document.getElementById('mensagem');
+    const audioGiro = document.getElementById('audio-giro');
+
+    const premios = [
+      { texto: '10 Meticais', cor: '#ff3b3b' },        // vermelho
+      { texto: '100 Meticais', cor: '#3bbf3b' },       // verde
+      { texto: '500 Meticais', cor: '#3b6fff' },       // azul
+      { texto: 'Boa Meticais Sorte', cor: '#f9d94c' }, // amarelo
+      { texto: '500 Meticais', cor: '#3bbf3b' },       // verde
+      { texto: '10000 Meticais', cor: '#3b6fff' },     // azul
+      { texto: '5000 Meticais', cor: '#ff3b3b' },      // vermelho
+      { texto: '1000 Meticais', cor: '#f9d94c' },      // amarelo
     ];
 
-    const wheel = document.getElementById('wheel');
-    const spinBtn = document.getElementById('spin');
-    let spinning = false;
-    let spinCount = 0;
+    const numFatias = premios.length;
+    const anguloPorFat = (2 * Math.PI) / numFatias;
 
-    function buildWheel() {
-      const angle = 360 / slices.length;
-      slices.forEach((slice, index) => {
-        const div = document.createElement('div');
-        div.className = 'slice';
-        div.style.background = slice.color;
-        div.style.transform = `rotate(${index * angle}deg) skewY(-${90 - angle}deg)`;
-        div.innerHTML = `<div style="transform: skewY(${90 - angle}deg) rotate(${angle / 2}deg)">${slice.label}</div>`;
-        wheel.appendChild(div);
-      });
+    let rotacaoAtual = 0;
+    let tentativas = 0;
+    const maxTentativas = 2;
+
+    // Desenha a roleta com fatias e texto
+    function desenharRoleta() {
+      const centroX = canvas.width / 2;
+      const centroY = canvas.height / 2;
+      const raio = canvas.width / 2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for(let i = 0; i < numFatias; i++) {
+        const inicioAng = i * anguloPorFat;
+        const fimAng = inicioAng + anguloPorFat;
+
+        // Cor da fatia
+        ctx.beginPath();
+        ctx.moveTo(centroX, centroY);
+        ctx.arc(centroX, centroY, raio, inicioAng, fimAng);
+        ctx.fillStyle = premios[i].cor;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Texto da fatia
+        ctx.save();
+        ctx.translate(centroX, centroY);
+        ctx.rotate(inicioAng + anguloPorFat / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#000';
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText(premios[i].texto, raio - 15, 10);
+        ctx.restore();
+      }
     }
 
-    function getRotationForLabel(label) {
-      const index = slices.findIndex(s => s.label === label);
-      const anglePerSlice = 360 / slices.length;
-      const stopAngle = 360 - (index * anglePerSlice + anglePerSlice / 2);
-      return stopAngle + 360 * 5;
-    }
-
-    function playSound() {
-      const audio = new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg');
-      audio.play();
-    }
-
-    spinBtn.addEventListener('click', () => {
-      if (spinning) return;
-
-      spinning = true;
-      spinCount++;
-
-      let stopLabel = 'Boa Sorte';
-      if (spinCount === 2) {
-        stopLabel = Math.random() < 0.5 ? '5000' : '10000';
+    // Função para animar o giro
+    function girarRoleta() {
+      if(tentativas >= maxTentativas) {
+        mensagem.textContent = 'Você já usou suas tentativas gratuitas!';
+        return;
       }
 
-      const rotation = getRotationForLabel(stopLabel);
-      wheel.style.transition = 'transform 5s cubic-bezier(0.33, 1, 0.68, 1)';
-      wheel.style.transform = `rotate(${rotation}deg)`;
+      btnGirar.disabled = true;
+      mensagem.textContent = '';
 
-      setTimeout(() => {
-        playSound();
+      // Começa o som
+      audioGiro.currentTime = 0;
+      audioGiro.play();
 
-        if (spinCount === 1) {
-          alert(`Resultado: ${stopLabel}`);
-          spinBtn.textContent = 'GIRAR NOVAMENTE';
+      // Definir em qual fatia a roleta deve parar
+      let fatiaDestino;
+
+      if(tentativas === 0) {
+        fatiaDestino = premios.findIndex(p => p.texto === 'Boa Meticais Sorte');
+      } else if(tentativas === maxTentativas -1) {
+        const opcoes = ['5000 Meticais', '10000 Meticais'];
+        const escolha = opcoes[Math.floor(Math.random() * opcoes.length)];
+        fatiaDestino = premios.findIndex(p => p.texto === escolha);
+      } else {
+        fatiaDestino = Math.floor(Math.random() * numFatias);
+      }
+
+      const anguloDestino = (numFatias - fatiaDestino) * anguloPorFat - (anguloPorFat / 2);
+      const giros = Math.floor(Math.random() * 2) + 5;
+      const duracao = 5000;
+
+      const inicio = performance.now();
+      const rotacaoInicial = rotacaoAtual;
+      const rotacaoFinal = (giros * 2 * Math.PI) + anguloDestino;
+
+      function animar(now) {
+        const tempoDecorrido = now - inicio;
+        if(tempoDecorrido < duracao) {
+          const t = tempoDecorrido / duracao;
+          const easing = 1 - Math.pow(1 - t, 3);
+          rotacaoAtual = rotacaoInicial + easing * (rotacaoFinal - rotacaoInicial);
+          canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
+          requestAnimationFrame(animar);
         } else {
-          const modal = confirm(`🎉 Parabéns! Você ganhou ${stopLabel} Meticais!\nClique OK para se registar.`);
-          if (modal) {
-            window.location.href = "https://is.gd/hHdRiZ";
-            alert("Caro usuário, primeiro faça um depósito mínimo de 10 Mts e aguarde pacientemente.");
-          }
+          rotacaoAtual = rotacaoFinal % (2 * Math.PI);
+          canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
+          audioGiro.pause();
+          mostrarResultado(fatiaDestino);
+          tentativas++;
+          btnGirar.disabled = false;
         }
+      }
+      requestAnimationFrame(animar);
+    }
 
-        spinning = false;
-      }, 5100);
-    });
+    // Mostrar o resultado com mensagem e botão registrar na última tentativa
+    function mostrarResultado(index) {
+      const premio = premios[index];
+      if(tentativas === 0) {
+        mensagem.textContent = `Parou em: ${premio.texto}! Boa sorte!`;
+      } else if(tentativas === maxTentativas -1) {
+        mensagem.innerHTML = `🎉 Parabéns! Você ganhou: <strong>${premio.texto}</strong>!<br><br>`;
+        mensagem.innerHTML += `<a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank" rel="noopener noreferrer">Registrar</a>`;
+      } else {
+        mensagem.textContent = `Você ganhou: ${premio.texto}!`;
+      }
+    }
 
-    buildWheel();
+    btnGirar.addEventListener('click', girarRoleta);
+
+    desenharRoleta();
   </script>
 </body>
-</html>
+  </html>
