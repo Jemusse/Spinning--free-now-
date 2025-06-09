@@ -60,7 +60,7 @@
       filter: drop-shadow(1px 1px 2px #880000);
       z-index: 10;
     }
-    button#girar {
+    #girar {
       margin-top: 30px;
       background-color: #ff9500;
       border: none;
@@ -72,35 +72,36 @@
       cursor: pointer;
       box-shadow: 0 5px 0 #c66d00;
     }
-    button#girar:disabled {
+    #girar:disabled {
       background-color: #ccc;
       cursor: not-allowed;
       box-shadow: none;
     }
-    button#girar:hover:not(:disabled) {
-      background-color: #ffa733;
-    }
     .mensagem {
-      margin-top: 30px;
-      font-size: 22px;
-      font-weight: 700;
-      min-height: 60px;
-      color: #333;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+      font-size: 18px;
+      font-weight: bold;
+      color: #222;
+      max-width: 280px;
+      z-index: 20;
+      display: none;
     }
-    a#registrar-btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 12px 30px;
+    .mensagem a {
+      display: block;
+      margin-top: 12px;
       background-color: #28a745;
+      padding: 10px 15px;
       color: white;
-      font-size: 20px;
-      font-weight: 700;
-      border-radius: 8px;
       text-decoration: none;
-      box-shadow: 0 4px 0 #1f7a33;
-    }
-    a#registrar-btn:hover {
-      background-color: #34c759;
+      border-radius: 6px;
+      font-weight: bold;
     }
 
     @media (max-width: 400px) {
@@ -114,16 +115,13 @@
         border-right: 25px solid transparent;
         border-bottom: 33px solid red;
       }
-      button#girar {
+      #girar {
         font-size: 18px;
         padding: 12px 30px;
       }
       .mensagem {
-        font-size: 18px;
-        min-height: 50px;
-      }
-      .info-text {
-        font-size: 1.1rem;
+        font-size: 16px;
+        max-width: 240px;
       }
     }
   </style>
@@ -135,18 +133,20 @@
     <div class="roleta">
       <canvas id="canvas" width="360" height="360"></canvas>
       <div class="seta" title="Seta Indicadora"></div>
+      <div class="mensagem" id="mensagem"></div>
     </div>
     <button id="girar">GIRAR</button>
-    <div class="mensagem" id="mensagem"></div>
   </div>
 
-  <!-- Áudios -->
+  <!-- Áudio de giro -->
   <audio id="audio-giro" loop>
     <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
+    Seu navegador não suporta áudio.
   </audio>
 
+  <!-- Áudio de parabéns -->
   <audio id="audio-campainha">
-    <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" type="audio/ogg">
+    <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
   </audio>
 
   <script>
@@ -161,7 +161,7 @@
       { texto: '10 Meticais', cor: '#ff3b3b' },
       { texto: '100 Meticais', cor: '#3bbf3b' },
       { texto: '500 Meticais', cor: '#3b6fff' },
-      { texto: 'Boa Meticais Sorte', cor: '#f9d94c' },
+      { texto: 'Boa Sorte', cor: '#f9d94c' },
       { texto: '500 Meticais', cor: '#3bbf3b' },
       { texto: '10000 Meticais', cor: '#3b6fff' },
       { texto: '5000 Meticais', cor: '#ff3b3b' },
@@ -170,7 +170,6 @@
 
     const numFatias = premios.length;
     const anguloPorFat = (2 * Math.PI) / numFatias;
-
     let rotacaoAtual = 0;
     let tentativas = 0;
     const maxTentativas = 2;
@@ -182,7 +181,7 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for(let i = 0; i < numFatias; i++) {
+      for (let i = 0; i < numFatias; i++) {
         const inicioAng = i * anguloPorFat;
         const fimAng = inicioAng + anguloPorFat;
 
@@ -207,20 +206,18 @@
     }
 
     function girarRoleta() {
-      if(tentativas >= maxTentativas) {
-        mensagem.textContent = 'Você já usou suas tentativas gratuitas!';
-        return;
-      }
+      if (tentativas >= maxTentativas) return;
 
       btnGirar.disabled = true;
-      mensagem.textContent = '';
+      mensagem.style.display = 'none';
 
       audioGiro.currentTime = 0;
       audioGiro.play();
 
       let fatiaDestino;
-      if(tentativas === 0) {
-        fatiaDestino = premios.findIndex(p => p.texto === 'Boa Meticais Sorte');
+
+      if (tentativas === 0) {
+        fatiaDestino = premios.findIndex(p => p.texto === 'Boa Sorte');
       } else {
         const opcoes = ['5000 Meticais', '10000 Meticais'];
         const escolha = opcoes[Math.floor(Math.random() * opcoes.length)];
@@ -237,7 +234,7 @@
 
       function animar(now) {
         const tempoDecorrido = now - inicio;
-        if(tempoDecorrido < duracao) {
+        if (tempoDecorrido < duracao) {
           const t = tempoDecorrido / duracao;
           const easing = 1 - Math.pow(1 - t, 3);
           rotacaoAtual = rotacaoInicial + easing * (rotacaoFinal - rotacaoInicial);
@@ -257,18 +254,18 @@
 
     function mostrarResultado(index) {
       const premio = premios[index];
-      if(tentativas === 0) {
-        mensagem.textContent = `Parou em: ${premio.texto}! Boa sorte!`;
-      } else if(tentativas === maxTentativas - 1) {
+      mensagem.style.display = 'block';
+
+      if (tentativas === 0) {
+        mensagem.innerHTML = `Parou em: <strong>${premio.texto}</strong><br>Boa sorte!`;
+      } else {
         audioCampainha.currentTime = 0;
         audioCampainha.play();
         mensagem.innerHTML = `
           🎉 <strong>Parabéns por se tornar o novo vendedor!</strong><br><br>
-          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.<br><br>
-          <a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank" rel="noopener noreferrer">Registar</a>
+          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.
+          <a href="https://is.gd/hHdRiZ" target="_blank">Registar</a>
         `;
-      } else {
-        mensagem.textContent = `Você ganhou: ${premio.texto}!`;
       }
     }
 
@@ -277,4 +274,4 @@
     desenharRoleta();
   </script>
 </body>
-</html>
+  </html>
