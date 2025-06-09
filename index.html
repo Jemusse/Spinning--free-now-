@@ -77,20 +77,21 @@
       cursor: not-allowed;
       box-shadow: none;
     }
+
+    /* Quadro fora da roleta */
     .mensagem {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      margin-top: 30px;
       background: #fff;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+      border: 3px solid #007bff;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       font-size: 18px;
       font-weight: bold;
       color: #222;
-      max-width: 280px;
-      z-index: 20;
+      max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
       display: none;
     }
     .mensagem a {
@@ -121,7 +122,7 @@
       }
       .mensagem {
         font-size: 16px;
-        max-width: 240px;
+        max-width: 260px;
       }
     }
   </style>
@@ -133,18 +134,17 @@
     <div class="roleta">
       <canvas id="canvas" width="360" height="360"></canvas>
       <div class="seta" title="Seta Indicadora"></div>
-      <div class="mensagem" id="mensagem"></div>
     </div>
     <button id="girar">GIRAR</button>
+
+    <!-- Mensagem abaixo da roleta -->
+    <div class="mensagem" id="mensagem"></div>
   </div>
 
-  <!-- Áudio de giro -->
+  <!-- Áudios -->
   <audio id="audio-giro" loop>
     <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
-    Seu navegador não suporta áudio.
   </audio>
-
-  <!-- Áudio de parabéns -->
   <audio id="audio-campainha">
     <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
   </audio>
@@ -256,8 +256,11 @@
       const premio = premios[index];
       mensagem.style.display = 'block';
 
-      if (tentativas === 0) {
-        mensagem.innerHTML = `Parou em: <strong>${premio.texto}</strong><br>Boa sorte!`;
+      if (tentativas === 1) {
+        mensagem.innerHTML = `
+          Parou em: <strong>${premio.texto}</strong><br>
+          Boa sorte!<br><small style="color: #888;">Tenta novamente</small>
+        `;
       } else {
         audioCampainha.currentTime = 0;
         audioCampainha.play();
@@ -274,4 +277,4 @@
     desenharRoleta();
   </script>
 </body>
-  </html>
+</html>
