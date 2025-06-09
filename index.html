@@ -3,49 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Roleta de Prêmios Realista</title>
+  <title>Roleta de Prêmios</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      text-align: center;
       background: #f9f9f9;
-      margin: 0;
-      padding: 40px 0;
+      text-align: center;
+      padding: 40px 10px;
     }
     .container {
-      max-width: 360px;
+      max-width: 380px;
       margin: 0 auto;
-      position: relative;
-      padding: 0 10px;
     }
     h1 {
+      font-size: 1.8rem;
       margin-bottom: 10px;
-      font-size: 1.6rem;
-      color: #222;
     }
     .info-text {
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-size: 1.2rem;
       margin-bottom: 20px;
-      color: #333;
     }
     .roleta {
       position: relative;
       width: 360px;
       height: 360px;
       margin: 0 auto;
+      border: 8px solid gold;
       border-radius: 50%;
       box-shadow: 0 0 15px gold;
-      border: 8px solid #b8860b;
       overflow: hidden;
-      background: white;
     }
     #canvas {
-      display: block;
-      margin: 0 auto;
-      border-radius: 50%;
       width: 100%;
       height: 100%;
+      border-radius: 50%;
+      display: block;
     }
     .seta {
       position: absolute;
@@ -58,72 +50,54 @@
       border-bottom: 40px solid red;
       transform: translateY(-50%);
       filter: drop-shadow(1px 1px 2px #880000);
-      z-index: 10;
     }
     #girar {
       margin-top: 30px;
-      background-color: #ff9500;
-      border: none;
       padding: 15px 40px;
       font-size: 20px;
       font-weight: bold;
       color: white;
+      background: #ff9500;
+      border: none;
       border-radius: 10px;
       cursor: pointer;
       box-shadow: 0 5px 0 #c66d00;
     }
+    #girar:hover {
+      background-color: #ffa733;
+    }
     #girar:disabled {
-      background-color: #ccc;
+      background: #ccc;
       cursor: not-allowed;
       box-shadow: none;
     }
-
-    /* Quadro fora da roleta */
     .mensagem {
-      margin-top: 30px;
-      background: #fff;
+      display: none;
+      margin-top: 25px;
       padding: 20px;
-      border: 3px solid #007bff;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
       font-size: 18px;
-      font-weight: bold;
-      color: #222;
-      max-width: 340px;
+      font-weight: 600;
+      max-width: 320px;
       margin-left: auto;
       margin-right: auto;
-      display: none;
+      background: #fff;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     }
-    .mensagem a {
-      display: block;
+    #registrar-btn {
       margin-top: 12px;
+      display: inline-block;
+      padding: 12px 30px;
       background-color: #28a745;
-      padding: 10px 15px;
       color: white;
+      font-size: 18px;
+      font-weight: 700;
+      border-radius: 8px;
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: bold;
+      box-shadow: 0 4px 0 #1f7a33;
     }
-
-    @media (max-width: 400px) {
-      .roleta {
-        width: 280px;
-        height: 280px;
-      }
-      .seta {
-        right: -40px;
-        border-left: 25px solid transparent;
-        border-right: 25px solid transparent;
-        border-bottom: 33px solid red;
-      }
-      #girar {
-        font-size: 18px;
-        padding: 12px 30px;
-      }
-      .mensagem {
-        font-size: 16px;
-        max-width: 260px;
-      }
+    #registrar-btn:hover {
+      background-color: #34c759;
     }
   </style>
 </head>
@@ -133,11 +107,9 @@
     <div class="info-text">Tente a sua sorte!</div>
     <div class="roleta">
       <canvas id="canvas" width="360" height="360"></canvas>
-      <div class="seta" title="Seta Indicadora"></div>
+      <div class="seta"></div>
     </div>
     <button id="girar">GIRAR</button>
-
-    <!-- Mensagem abaixo da roleta -->
     <div class="mensagem" id="mensagem"></div>
   </div>
 
@@ -146,7 +118,7 @@
     <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
   </audio>
   <audio id="audio-campainha">
-    <source src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg" type="audio/ogg">
+    <source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" type="audio/ogg">
   </audio>
 
   <script>
@@ -170,24 +142,25 @@
 
     const numFatias = premios.length;
     const anguloPorFat = (2 * Math.PI) / numFatias;
+
     let rotacaoAtual = 0;
     let tentativas = 0;
     const maxTentativas = 2;
 
     function desenharRoleta() {
-      const centroX = canvas.width / 2;
-      const centroY = canvas.height / 2;
-      const raio = canvas.width / 2;
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const r = canvas.width / 2;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < numFatias; i++) {
-        const inicioAng = i * anguloPorFat;
-        const fimAng = inicioAng + anguloPorFat;
+        const angIni = i * anguloPorFat;
+        const angFim = angIni + anguloPorFat;
 
         ctx.beginPath();
-        ctx.moveTo(centroX, centroY);
-        ctx.arc(centroX, centroY, raio, inicioAng, fimAng);
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, angIni, angFim);
         ctx.fillStyle = premios[i].cor;
         ctx.fill();
         ctx.strokeStyle = '#fff';
@@ -195,18 +168,21 @@
         ctx.stroke();
 
         ctx.save();
-        ctx.translate(centroX, centroY);
-        ctx.rotate(inicioAng + anguloPorFat / 2);
+        ctx.translate(cx, cy);
+        ctx.rotate(angIni + anguloPorFat / 2);
         ctx.textAlign = 'right';
         ctx.fillStyle = '#000';
-        ctx.font = 'bold 18px Arial';
-        ctx.fillText(premios[i].texto, raio - 15, 10);
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(premios[i].texto, r - 15, 10);
         ctx.restore();
       }
     }
 
     function girarRoleta() {
-      if (tentativas >= maxTentativas) return;
+      if (tentativas >= maxTentativas) {
+        mensagem.textContent = 'Você já usou suas tentativas!';
+        return;
+      }
 
       btnGirar.disabled = true;
       mensagem.style.display = 'none';
@@ -214,37 +190,35 @@
       audioGiro.currentTime = 0;
       audioGiro.play();
 
-      let fatiaDestino;
-
+      let destino;
       if (tentativas === 0) {
-        fatiaDestino = premios.findIndex(p => p.texto === 'Boa Sorte');
+        destino = premios.findIndex(p => p.texto === 'Boa Sorte');
       } else {
         const opcoes = ['5000 Meticais', '10000 Meticais'];
-        const escolha = opcoes[Math.floor(Math.random() * opcoes.length)];
-        fatiaDestino = premios.findIndex(p => p.texto === escolha);
+        const escolhido = opcoes[Math.floor(Math.random() * opcoes.length)];
+        destino = premios.findIndex(p => p.texto === escolhido);
       }
 
-      const anguloDestino = (numFatias - fatiaDestino) * anguloPorFat - (anguloPorFat / 2);
-      const giros = Math.floor(Math.random() * 2) + 5;
+      const anguloDestino = (numFatias - destino) * anguloPorFat - anguloPorFat / 2;
+      const giros = 6;
       const duracao = 5000;
-
       const inicio = performance.now();
-      const rotacaoInicial = rotacaoAtual;
-      const rotacaoFinal = (giros * 2 * Math.PI) + anguloDestino;
+      const rotInicial = rotacaoAtual;
+      const rotFinal = giros * 2 * Math.PI + anguloDestino;
 
-      function animar(now) {
-        const tempoDecorrido = now - inicio;
-        if (tempoDecorrido < duracao) {
-          const t = tempoDecorrido / duracao;
-          const easing = 1 - Math.pow(1 - t, 3);
-          rotacaoAtual = rotacaoInicial + easing * (rotacaoFinal - rotacaoInicial);
+      function animar(t) {
+        const tempo = t - inicio;
+        if (tempo < duracao) {
+          const progress = tempo / duracao;
+          const easing = 1 - Math.pow(1 - progress, 3);
+          rotacaoAtual = rotInicial + easing * (rotFinal - rotInicial);
           canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
           requestAnimationFrame(animar);
         } else {
-          rotacaoAtual = rotacaoFinal % (2 * Math.PI);
+          rotacaoAtual = rotFinal % (2 * Math.PI);
           canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
           audioGiro.pause();
-          mostrarResultado(fatiaDestino);
+          mostrarResultado(destino);
           tentativas++;
           btnGirar.disabled = false;
         }
@@ -255,26 +229,34 @@
     function mostrarResultado(index) {
       const premio = premios[index];
       mensagem.style.display = 'block';
+      mensagem.style.border = '4px solid';
+      mensagem.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
+      mensagem.style.backgroundColor = '#fff';
+      mensagem.style.padding = '20px';
+      mensagem.style.fontSize = '18px';
+      mensagem.style.maxWidth = '320px';
+      mensagem.style.marginLeft = 'auto';
+      mensagem.style.marginRight = 'auto';
 
-      if (tentativas === 1) {
+      if (tentativas === 0) {
+        mensagem.style.borderColor = '#007bff';
         mensagem.innerHTML = `
-          Parou em: <strong>${premio.texto}</strong><br>
-          Boa sorte!<br><small style="color: #888;">Tenta novamente</small>
+          🎯 <strong>Boa sorte!</strong><br>
+          <span style="color:#555;">Tente novamente.</span>
         `;
       } else {
-        audioCampainha.currentTime = 0;
         audioCampainha.play();
+        mensagem.style.borderColor = '#d4af37';
         mensagem.innerHTML = `
           🎉 <strong>Parabéns por se tornar o novo vendedor!</strong><br><br>
-          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.
-          <a href="https://is.gd/hHdRiZ" target="_blank">Registar</a>
+          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.<br><br>
+          <a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank">Registar</a>
         `;
       }
     }
 
     btnGirar.addEventListener('click', girarRoleta);
-
     desenharRoleta();
   </script>
 </body>
-</html>
+    </html>
