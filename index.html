@@ -1,262 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Roleta de Prêmios</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aviator Links</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
+      background-color: #000;
+      color: #fff;
       text-align: center;
-      padding: 40px 10px;
+      padding: 30px 15px;
     }
-    .container {
-      max-width: 380px;
-      margin: 0 auto;
-    }
+
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
+      color: #fff;
+      margin-bottom: 25px;
     }
-    .info-text {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
+
+    img {
+      width: 250px;
+      height: auto;
+      margin-bottom: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
     }
-    .roleta {
-      position: relative;
-      width: 360px;
-      height: 360px;
-      margin: 0 auto;
-      border: 8px solid gold;
-      border-radius: 50%;
-      box-shadow: 0 0 15px gold;
-      overflow: hidden;
-    }
-    #canvas {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
+
+    .button {
       display: block;
-    }
-    .seta {
-      position: absolute;
-      top: 50%;
-      right: -50px;
-      width: 0;
-      height: 0;
-      border-left: 30px solid transparent;
-      border-right: 30px solid transparent;
-      border-bottom: 40px solid red;
-      transform: translateY(-50%);
-      filter: drop-shadow(1px 1px 2px #880000);
-    }
-    #girar {
-      margin-top: 30px;
-      padding: 15px 40px;
-      font-size: 20px;
+      width: 100%;
+      max-width: 320px;
+      margin: 12px auto;
+      padding: 15px;
+      font-size: 17px;
       font-weight: bold;
       color: white;
-      background: #ff9500;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      box-shadow: 0 5px 0 #c66d00;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    #girar:hover {
-      background-color: #ffa733;
+
+    .button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
-    #girar:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .mensagem {
-      display: none;
-      margin-top: 25px;
-      padding: 20px;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: 600;
-      max-width: 320px;
-      margin-left: auto;
-      margin-right: auto;
-      background: #fff;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.2);
-    }
-    #registrar-btn {
-      margin-top: 12px;
-      display: inline-block;
-      padding: 12px 30px;
-      background-color: #28a745;
-      color: white;
-      font-size: 18px;
-      font-weight: 700;
-      border-radius: 8px;
-      text-decoration: none;
-      box-shadow: 0 4px 0 #1f7a33;
-    }
-    #registrar-btn:hover {
-      background-color: #34c759;
-    }
+
+    .red { background-color: #ff1a1a; }
+    .green { background-color: #28a745; }
+    .blue { background-color: #007bff; }
+    .purple { background-color: #8e44ad; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Gire a Roleta e Ganhe!</h1>
-    <div class="info-text">Tente a sua sorte!</div>
-    <div class="roleta">
-      <canvas id="canvas" width="360" height="360"></canvas>
-      <div class="seta"></div>
-    </div>
-    <button id="girar">GIRAR</button>
-    <div class="mensagem" id="mensagem"></div>
-  </div>
 
-  <!-- Áudios -->
-  <audio id="audio-giro" loop>
-    <source src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" type="audio/ogg">
-  </audio>
-  <audio id="audio-campainha">
-    <source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" type="audio/ogg">
-  </audio>
+  <h1>🎮 Bem-vindo ao Aviator</h1>
 
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const btnGirar = document.getElementById('girar');
-    const mensagem = document.getElementById('mensagem');
-    const audioGiro = document.getElementById('audio-giro');
-    const audioCampainha = document.getElementById('audio-campainha');
+  <!-- Imagem do Aviator -->
+  <img src="https://i.postimg.cc/FKK2VtbK/aviator-plane.png" alt="Aviator Imagem">
 
-    const premios = [
-      { texto: '10 Meticais', cor: '#ff3b3b' },
-      { texto: '100 Meticais', cor: '#3bbf3b' },
-      { texto: '500 Meticais', cor: '#3b6fff' },
-      { texto: 'Boa Sorte', cor: '#f9d94c' },
-      { texto: '500 Meticais', cor: '#3bbf3b' },
-      { texto: '10000 Meticais', cor: '#3b6fff' },
-      { texto: '5000 Meticais', cor: '#ff3b3b' },
-      { texto: '1000 Meticais', cor: '#f9d94c' },
-    ];
+  <!-- Botões coloridos e intercalados -->
+  <a href="https://txunaplay.com/t28b2ac77" target="_blank">
+    <button class="button red">Criar Conta (Txunaplay)</button>
+  </a>
 
-    const numFatias = premios.length;
-    const anguloPorFat = (2 * Math.PI) / numFatias;
+  <a href="https://is.gd/1WQMWs" target="_blank">
+    <button class="button green">Acessar Sinais da Txuna Bet</button>
+  </a>
 
-    let rotacaoAtual = 0;
-    let tentativas = 0;
-    const maxTentativas = 2;
+  <a href="https://www.megagamelive.com/affiliates/?btag=2184909" target="_blank">
+    <button class="button blue">Criar Conta (Megagamelive)</button>
+  </a>
 
-    function desenharRoleta() {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const r = canvas.width / 2;
+  <button class="button purple" onclick="alert('⚠️ Ainda não está disponível! Aguarde novidades.')">
+    Acessar Sinais da Megagamelive
+  </button>
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      for (let i = 0; i < numFatias; i++) {
-        const angIni = i * anguloPorFat;
-        const angFim = angIni + anguloPorFat;
-
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, r, angIni, angFim);
-        ctx.fillStyle = premios[i].cor;
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(angIni + anguloPorFat / 2);
-        ctx.textAlign = 'right';
-        ctx.fillStyle = '#000';
-        ctx.font = 'bold 16px Arial';
-        ctx.fillText(premios[i].texto, r - 15, 10);
-        ctx.restore();
-      }
-    }
-
-    function girarRoleta() {
-      if (tentativas >= maxTentativas) {
-        mensagem.textContent = 'Você já usou suas tentativas!';
-        return;
-      }
-
-      btnGirar.disabled = true;
-      mensagem.style.display = 'none';
-
-      audioGiro.currentTime = 0;
-      audioGiro.play();
-
-      let destino;
-      if (tentativas === 0) {
-        destino = premios.findIndex(p => p.texto === 'Boa Sorte');
-      } else {
-        const opcoes = ['5000 Meticais', '10000 Meticais'];
-        const escolhido = opcoes[Math.floor(Math.random() * opcoes.length)];
-        destino = premios.findIndex(p => p.texto === escolhido);
-      }
-
-      const anguloDestino = (numFatias - destino) * anguloPorFat - anguloPorFat / 2;
-      const giros = 6;
-      const duracao = 5000;
-      const inicio = performance.now();
-      const rotInicial = rotacaoAtual;
-      const rotFinal = giros * 2 * Math.PI + anguloDestino;
-
-      function animar(t) {
-        const tempo = t - inicio;
-        if (tempo < duracao) {
-          const progress = tempo / duracao;
-          const easing = 1 - Math.pow(1 - progress, 3);
-          rotacaoAtual = rotInicial + easing * (rotFinal - rotInicial);
-          canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
-          requestAnimationFrame(animar);
-        } else {
-          rotacaoAtual = rotFinal % (2 * Math.PI);
-          canvas.style.transform = `rotate(${rotacaoAtual}rad)`;
-          audioGiro.pause();
-          mostrarResultado(destino);
-          tentativas++;
-          btnGirar.disabled = false;
-        }
-      }
-      requestAnimationFrame(animar);
-    }
-
-    function mostrarResultado(index) {
-      const premio = premios[index];
-      mensagem.style.display = 'block';
-      mensagem.style.border = '4px solid';
-      mensagem.style.boxShadow = '0 6px 20px rgba(0,0,0,0.3)';
-      mensagem.style.backgroundColor = '#fff';
-      mensagem.style.padding = '20px';
-      mensagem.style.fontSize = '18px';
-      mensagem.style.maxWidth = '320px';
-      mensagem.style.marginLeft = 'auto';
-      mensagem.style.marginRight = 'auto';
-
-      if (tentativas === 0) {
-        mensagem.style.borderColor = '#007bff';
-        mensagem.innerHTML = `
-          🎯 <strong>Boa sorte!</strong><br>
-          <span style="color:#555;">Tente novamente.</span>
-        `;
-      } else {
-        audioCampainha.play();
-        mensagem.style.borderColor = '#d4af37';
-        mensagem.innerHTML = `
-          🎉 <strong>Parabéns por se tornar o novo vendedor!</strong><br><br>
-          Caro usuário, após o seu registo faça um depósito mínimo de <strong>10 Mts</strong> e aguarde pacientemente.<br><br>
-          <a id="registrar-btn" href="https://is.gd/hHdRiZ" target="_blank">Registar</a>
-        `;
-      }
-    }
-
-    btnGirar.addEventListener('click', girarRoleta);
-    desenharRoleta();
-  </script>
 </body>
-      </html>
+</html>
