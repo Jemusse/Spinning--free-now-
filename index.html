@@ -1,80 +1,95 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Aviator Links</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ganhe 10.000MT Jogando Roleta</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #000;
-      color: #fff;
       text-align: center;
-      padding: 30px 15px;
-    }
-
-    h1 {
+      background: #0f172a;
       color: #fff;
-      margin-bottom: 25px;
+      margin: 0;
+      padding: 0;
     }
-
-    img {
-      width: 260px;
-      height: auto;
-      margin-bottom: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+    .roleta {
+      margin: 30px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #ffc107;
+      background: url('https://i.imgur.com/LDmWz9z.png') no-repeat center center;
+      background-size: cover;
+      transition: transform 4s ease-out;
     }
-
-    .button {
-      display: block;
-      width: 100%;
-      max-width: 320px;
-      margin: 12px auto;
-      padding: 15px;
-      font-size: 17px;
-      font-weight: bold;
+    button {
+      background-color: #10b981;
       color: white;
+      padding: 15px 30px;
+      font-size: 18px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 20px;
     }
-
-    .button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    #mensagem {
+      display: none;
+      background-color: white;
+      color: black;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
     }
-
-    .red { background-color: #ff1a1a; }
-    .green { background-color: #28a745; }
-    .blue { background-color: #007bff; }
-    .purple { background-color: #8e44ad; }
+    #mensagem button {
+      background-color: orange;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
 
-  <h1>🎮 Bem-vindo ao Aviator</h1>
+  <h1>🎯 Ganhe até 10.000MT Jogando Roleta!</h1>
+  <p>Clique no botão abaixo para girar a roleta. Você tem 3 chances!</p>
 
-  <!-- Imagem nova do Aviator -->
-  <img src="https://cdn.pixabay.com/photo/2023/02/01/22/35/airplane-7760573_1280.png" alt="Imagem Aviator">
+  <div class="roleta" id="roleta"></div>
+  <button onclick="girarRoleta()">GIRAR</button>
 
-  <!-- Botões coloridos e intercalados -->
-  <a href="https://txunaplay.com/t28b2ac77" target="_blank">
-    <button class="button red">Criar Conta (Txunaplay)</button>
-  </a>
+  <div id="mensagem">
+    <h2>🎉 Resultado 🎉</h2>
+    <p>💰 Parabéns! Você ganhou <strong id="premio">5.000</strong> Meticais!</p>
+    <p>
+      Para receber, registre-se na plataforma clicando no botão abaixo e deposite 1 ou 5 Meticais
+      para confirmar seu número.
+    </p>
+    <p>⚠️ O prêmio só será entregue para quem criar nova conta na plataforma.</p>
+    <a href="https://is.gd/hHdRiZ" target="_blank">
+      <button>💸 REGISTRE-SE AGORA!</button>
+    </a>
+  </div>
 
-  <a href="https://is.gd/1WQMWs" target="_blank">
-    <button class="button green">Acessar Sinais da Txuna Bet</button>
-  </a>
+  <script>
+    let giros = 0;
+    const roleta = document.getElementById("roleta");
+    const mensagem = document.getElementById("mensagem");
+    const premioTexto = document.getElementById("premio");
 
-  <a href="https://www.megagamelive.com/affiliates/?btag=2184909" target="_blank">
-    <button class="button blue">Criar Conta (Megagamelive)</button>
-  </a>
-
-  <button class="button purple" onclick="alert('⚠️ Ainda não está disponível! Aguarde novidades.')">
-    Acessar Sinais da Megagamelive
-  </button>
+    function girarRoleta() {
+      giros++;
+      if (giros === 1) {
+        roleta.style.transform = "rotate(1440deg)"; // parar em Boa Sorte
+      } else if (giros === 2) {
+        const angulo = Math.random() < 0.5 ? 2520 : 2700; // 5000 ou 10000
+        roleta.style.transform = `rotate(${angulo}deg)`;
+      } else if (giros === 3) {
+        mensagem.style.display = "block";
+      }
+    }
+  </script>
 
 </body>
-</html>
+  </html>
